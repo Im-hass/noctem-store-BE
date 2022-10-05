@@ -1,0 +1,81 @@
+server:
+  port: 0
+  #  port: 12347
+  servlet:
+    encoding:
+      charset: UTF-8
+      enable: true
+      force: true
+  shutdown: graceful
+
+spring:
+  application:
+    name: ${STORE_SERVICE}
+  config:
+    import: optional:configserver:http://${CONFIG_SERVER}:8888
+  profiles:
+    active: ${PROFILE}
+  cloud:
+    config:
+      fail-fast: true
+    bus:
+      enabled: true
+      refresh:
+        enabled: true
+      destination: config-topic
+  kafka:
+    bootstrap-servers: http://${KAFKA_SERVER}:9092
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${MYSQL_SERVER}:3306/store?characterEncoding=UTF-8&serverTimezone=Asia/Seoul
+    username: ${NOCTEM_DB_USERNAME}
+    password: ${NOCTEM_DB_PASSWORD}
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true
+        query.in_clause_parameter_padding: true
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    hibernate.ddl-auto: update
+  redis:
+    host: ${REDIS_SERVER}
+    port: 6379
+
+eureka:
+  instance:
+    instance-id: ${spring.cloud.client.hostname}:${spring.application.instance_id:${random.value}}
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://${EUREKA_SERVER}:8761/eureka
+
+management:
+  endpoints:
+    web:
+      base-path: /api/${STORE_SERVICE}/actuator
+      exposure:
+        include: health, refresh, httptrace, busrefresh, prometheus, metrics
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    tags:
+      application: ${spring.application.name}
+
+logging:
+  charset:
+    console: UTF-8
+    file: UTF-8
+  level:
+    root: info
+    org.hibernate.SQL: debug
+    noctem.purchaseService: debug
+
+global:
+  jwt-token:
+    signer: ${NOCTEM_JWT_SIGNER}
+  api:
+    base-path: /api/${STORE_SERVICE}
+  value: local-purchase
