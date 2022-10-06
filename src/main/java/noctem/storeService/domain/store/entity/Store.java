@@ -31,7 +31,8 @@ public class Store extends BaseEntity {
     private List<String> imgList = new ArrayList<>();
     private String address;
     private String wayToCome; // 오시는 길
-    private String businessHours; // 영업시간
+    private String businessOpenHours; // 영업시간
+    private String businessCloseHours; // 영업시간
     private Boolean isParking;
     private Boolean isEcoStore;
     private Boolean isDriveThrough;
@@ -48,7 +49,7 @@ public class Store extends BaseEntity {
     private List<SoldOutMenu> soldOutMenuList = new ArrayList<>();
 
     @Builder
-    public Store(String name, Long managerId, Long supervisorId, Timestamp openDate, List<Long> staffIdList, String mainImg, List<String> imgList, String address, String wayToCome, String businessHours, Boolean isParking, Boolean isEcoStore, Boolean isDriveThrough, String contactNumber, Double latitude, Double longitude) {
+    public Store(String name, Long managerId, Long supervisorId, Timestamp openDate, List<Long> staffIdList, String mainImg, List<String> imgList, String address, String wayToCome, String businessOpenHours, String businessCloseHours, Boolean isParking, Boolean isEcoStore, Boolean isDriveThrough, String contactNumber, Double latitude, Double longitude) {
         this.name = name;
         this.managerId = managerId;
         this.supervisorId = supervisorId;
@@ -58,7 +59,8 @@ public class Store extends BaseEntity {
         this.imgList = imgList;
         this.address = address;
         this.wayToCome = wayToCome;
-        this.businessHours = businessHours;
+        this.businessOpenHours = businessOpenHours;
+        this.businessCloseHours = businessCloseHours;
         this.isParking = isParking;
         this.isEcoStore = isEcoStore;
         this.isDriveThrough = isDriveThrough;

@@ -19,7 +19,7 @@ public class StoreServiceImpl implements StoreService {
 
     @Override
     public List<SearchStoreResDto> searchStore(Double latitude, Double longitude) {
-        return storeRepository.findAllByLatitudeAndLongitude(latitude, longitude)
-                .stream().map(e -> new SearchStoreResDto(e.getStore(), e.getDistance())).collect(Collectors.toList());
+        return storeRepository.findDtoByNativeProjections(latitude, longitude)
+                .stream().map(e -> new SearchStoreResDto(e)).collect(Collectors.toList());
     }
 }
