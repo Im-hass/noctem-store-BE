@@ -19,9 +19,9 @@ public class FeignErrorDecoder implements ErrorDecoder {
     @Override
     public CommonException decode(String methodKey, Response response) {
         try {
-            CommonRequest commonRequest = objectMapper.readValue(
+            CommonResponse commonRequest = objectMapper.readValue(
                     CharStreams.toString(response.body().asReader(Charset.defaultCharset())),
-                    CommonRequest.class);
+                    CommonResponse.class);
             return CommonException.builder()
                     .errorCode(commonRequest.getErrorCode())
                     .httpStatus(HttpStatus.valueOf(response.status()))
