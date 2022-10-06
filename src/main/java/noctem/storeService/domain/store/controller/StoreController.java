@@ -18,9 +18,9 @@ public class StoreController {
     private final StoreService storeService;
 
     @GetMapping("/{storeId}")
-    public CommonResponse getStoreInfo() {
+    public CommonResponse getStoreInfo(@PathVariable Long storeId) {
         return CommonResponse.builder()
-                .data(null)
+                .data(storeService.getStoreInfo(storeId))
                 .build();
     }
 
