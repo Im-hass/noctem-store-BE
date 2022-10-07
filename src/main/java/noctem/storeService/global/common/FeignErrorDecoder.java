@@ -28,7 +28,7 @@ public class FeignErrorDecoder implements ErrorDecoder {
                     .build();
         } catch (Exception e) {
             return CommonException.builder()
-                    .errorCode(5000)
+                    .errorCode(5001)
                     .httpStatus(HttpStatus.valueOf(response.status()))
                     .build();
         }

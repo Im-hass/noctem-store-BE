@@ -22,9 +22,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class ExceptionControllerAdvice {
 //    @ExceptionHandler
 //    public ResponseEntity runtimeExHandle(RuntimeException ex) {
-//        log.error("Exception Name = {}, Code = 6000, Message = {}", ex.getClass().getName(), ex.getMessage());
+//        log.error("Exception Name = {}, Code = 5000, Message = {}", ex.getClass().getName(), ex.getMessage());
 //        return ResponseEntity.ok()
-//                .body(CommonResponse.builder().errorCode(6000).build());
+//                .body(CommonResponse.builder().errorCode(5000).build());
 //    }
 
     @ExceptionHandler
