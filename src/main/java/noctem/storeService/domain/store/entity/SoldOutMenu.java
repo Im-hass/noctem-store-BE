@@ -19,7 +19,7 @@ public class SoldOutMenu {
     private Long menuId;
 
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "store_id")
     private Store store;
 

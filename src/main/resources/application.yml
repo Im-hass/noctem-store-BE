@@ -77,4 +77,4 @@ global:
     signer: ${NOCTEM_JWT_SIGNER}
   api:
     base-path: /api/${STORE_SERVICE}
-  value: local-purchase
+  value: local-store

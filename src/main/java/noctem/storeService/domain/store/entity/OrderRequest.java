@@ -21,7 +21,7 @@ public class OrderRequest extends BaseEntity {
     private Long purchaseId;
     private OrderStatus orderStatus;
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "store_id")
     private Store store;
 

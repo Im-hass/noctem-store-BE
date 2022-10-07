@@ -2,6 +2,7 @@ package noctem.storeService.domain.store.controller;
 
 import lombok.RequiredArgsConstructor;
 import noctem.storeService.domain.store.dto.response.SearchStoreResDto;
+import noctem.storeService.domain.store.dto.response.SoldOutMenuResDto;
 import noctem.storeService.domain.store.service.StoreService;
 import noctem.storeService.global.common.CommonResponse;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +22,15 @@ public class StoreController {
     public CommonResponse getStoreInfo(@PathVariable Long storeId) {
         return CommonResponse.builder()
                 .data(storeService.getStoreInfo(storeId))
+                .build();
+    }
+
+    @GetMapping("/{storeId}/soldOut")
+    public CommonResponse getSoldOutMenu(@PathVariable Long storeId) {
+        List<SoldOutMenuResDto> dtoList = storeService.getSoldOutMenu(storeId);
+        dtoList.forEach(e -> e.setIndex(dtoList.indexOf(e)));
+        return CommonResponse.builder()
+                .data(dtoList)
                 .build();
     }
 

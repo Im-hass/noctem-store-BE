@@ -1,27 +1,40 @@
 package noctem.storeService;
 
 import lombok.RequiredArgsConstructor;
+import noctem.storeService.domain.store.entity.SoldOutMenu;
 import noctem.storeService.domain.store.entity.Store;
-import noctem.storeService.domain.store.repository.StoreRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
+import javax.persistence.EntityManager;
 import java.sql.Timestamp;
 import java.util.Arrays;
 
 @Component
 @RequiredArgsConstructor
 public class StoreInit {
-    private final StoreRepository storeRepository;
+    private final InitService initService;
     @Value("${spring.jpa.hibernate.ddl-auto}")
     private String ddlAuto;
 
     @PostConstruct
     public void init() {
         if (ddlAuto.equals("create")) {
+            initService.storeAndSoldOutMenuInit();
+        }
+    }
+
+    @Component
+    @Transactional
+    @RequiredArgsConstructor
+    static class InitService {
+        private final EntityManager entityManager;
+
+        public void storeAndSoldOutMenuInit() {
             // 1
-            storeRepository.save(
+            entityManager.persist(
                     Store.builder()
                             .name("본점")
                             .managerId(1L)
@@ -43,32 +56,42 @@ public class StoreInit {
             );
 
             // 2
-            storeRepository.save(
-                    Store.builder()
-                            .name("센텀시티역점")
-                            .managerId(1L)
-                            .openDate(new Timestamp(System.currentTimeMillis()))
-                            .staffIdList(Arrays.asList(2L, 3L, 4L))
-                            .mainImg("https://cdn.pixabay.com/photo/2017/10/27/09/38/halloween-2893710_960_720.jpg")
-                            .imgList(Arrays.asList("https://cdn.pixabay.com/photo/2017/10/27/09/38/halloween-2893710_960_720.jpg",
-                                    "https://cdnb.artstation.com/p/assets/images/images/023/740/591/large/jinsol-choi-4.jpg?1580206994",
-                                    "https://cdn.pixabay.com/photo/2017/10/27/09/38/halloween-2893710_960_720.jpg",
-                                    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQrruHEMFu5Xc4m9PnvmAt-A_DecFgOzBRNnw&usqp=CAU"))
-                            .address("부산 해운대구 센텀동로 9")
-                            .wayToCome("센텀시티역 2번 출구 앞")
-                            .businessOpenHours("10:00")
-                            .businessCloseHours("18:00")
-                            .isParking(false)
-                            .isEcoStore(true)
-                            .isDriveThrough(true)
-                            .contactNumber("051-0000-0000")
-                            .latitude(35.16993539960263)
-                            .longitude(129.1324954391096)
-                            .build()
-            );
+            Store store2 = Store.builder()
+                    .name("센텀시티역점")
+                    .managerId(1L)
+                    .openDate(new Timestamp(System.currentTimeMillis()))
+                    .staffIdList(Arrays.asList(2L, 3L, 4L))
+                    .mainImg("https://cdn.pixabay.com/photo/2017/10/27/09/38/halloween-2893710_960_720.jpg")
+                    .imgList(Arrays.asList("https://cdn.pixabay.com/photo/2017/10/27/09/38/halloween-2893710_960_720.jpg",
+                            "https://cdnb.artstation.com/p/assets/images/images/023/740/591/large/jinsol-choi-4.jpg?1580206994",
+                            "https://cdn.pixabay.com/photo/2017/10/27/09/38/halloween-2893710_960_720.jpg",
+                            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQrruHEMFu5Xc4m9PnvmAt-A_DecFgOzBRNnw&usqp=CAU"))
+                    .address("부산 해운대구 센텀동로 9")
+                    .wayToCome("센텀시티역 2번 출구 앞")
+                    .businessOpenHours("10:00")
+                    .businessCloseHours("18:00")
+                    .isParking(false)
+                    .isEcoStore(true)
+                    .isDriveThrough(true)
+                    .contactNumber("051-0000-0000")
+                    .latitude(35.16993539960263)
+                    .longitude(129.1324954391096)
+                    .build();
+
+            SoldOutMenu soldOutMenu1 = SoldOutMenu.builder()
+                    .menuId(1L)
+                    .build()
+                    .linkToStore(store2);
+
+            SoldOutMenu soldOutMenu2 = SoldOutMenu.builder()
+                    .menuId(2L)
+                    .build()
+                    .linkToStore(store2);
+            entityManager.persist(soldOutMenu1);
+            entityManager.persist(soldOutMenu2);
 
             // 3
-            storeRepository.save(
+            entityManager.persist(
                     Store.builder()
                             .name("센텀드림월드점")
                             .managerId(1L)
@@ -92,7 +115,7 @@ public class StoreInit {
             );
 
             // 4
-            storeRepository.save(
+            entityManager.persist(
                     Store.builder()
                             .name("센텀로점")
                             .managerId(1L)
@@ -114,7 +137,7 @@ public class StoreInit {
             );
 
             // 5
-            storeRepository.save(
+            entityManager.persist(
                     Store.builder()
                             .name("센텀신세계F1점")
                             .managerId(1L)
@@ -136,7 +159,7 @@ public class StoreInit {
             );
 
             // 6
-            storeRepository.save(
+            entityManager.persist(
                     Store.builder()
                             .name("벡스코점")
                             .managerId(1L)
@@ -158,7 +181,7 @@ public class StoreInit {
             );
 
             // 7
-            storeRepository.save(
+            entityManager.persist(
                     Store.builder()
                             .name("센텀KNN점")
                             .managerId(1L)

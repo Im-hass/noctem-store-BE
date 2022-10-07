@@ -35,7 +35,9 @@ jib {
                 "USER_SERVICE"      : "user-service",
                 "PURCHASE_SERVICE"  : "purchase-service",
                 "MENU_SERVICE"      : "menu-service",
-                "STORE_SERVICE"     : "store-service"
+                "STORE_SERVICE"     : "store-service",
+                "ADMIN_SERVICE"     : "admin-service",
+                "GIFT_SERVICE"      : "gift-service"
         ]
     }
 }
