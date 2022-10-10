@@ -1,5 +1,8 @@
 package noctem.storeService.global.enumeration;
 
+import noctem.storeService.global.common.CommonException;
+import org.springframework.http.HttpStatus;
+
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -22,6 +25,9 @@ public enum OrderStatus {
     private static final Map<String, OrderStatus> VALUE_MAP = Stream.of(values()).collect(Collectors.toMap(OrderStatus::getValue, e -> e));
 
     public static OrderStatus findByValue(String value) {
+        if (!VALUE_MAP.containsKey(value)) {
+            throw CommonException.builder().errorCode(5003).httpStatus(HttpStatus.BAD_REQUEST).build();
+        }
         return VALUE_MAP.get(value);
     }
 }

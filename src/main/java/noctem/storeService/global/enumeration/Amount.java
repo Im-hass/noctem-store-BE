@@ -1,5 +1,8 @@
 package noctem.storeService.global.enumeration;
 
+import noctem.storeService.global.common.CommonException;
+import org.springframework.http.HttpStatus;
+
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -23,7 +26,7 @@ public enum Amount {
     EIGHT("8"),
     NINE("9");
 
-    private String value;
+    private final String value;
 
     Amount(String value) {
         this.value = value;
@@ -36,6 +39,9 @@ public enum Amount {
     private static final Map<String, Amount> VALUE_MAP = Stream.of(values()).collect(Collectors.toMap(Amount::getValue, e -> e));
 
     public static Amount findByValue(String value) {
+        if (!VALUE_MAP.containsKey(value)) {
+            throw CommonException.builder().errorCode(2026).httpStatus(HttpStatus.BAD_REQUEST).build();
+        }
         return VALUE_MAP.get(value);
     }
 }
