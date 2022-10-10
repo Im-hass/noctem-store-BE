@@ -1,4 +1,4 @@
-package noctem.storeService.domain.store.entity;
+package noctem.storeService.store.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
@@ -12,6 +12,18 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
+/***
+ * managerId: 점장id
+ * supervisorId: 본사의 매장 관리 담당자
+ * openDate: 매장 오픈 날짜
+ * wayToCome: 오시는 길
+ * businessOpenHours: 영업 시작시간
+ * businessCloseHours: 영업 마감시간
+ * isOpen: 현재 영업상태 true: 영업중, false: 마감됨
+ * contactNumber: 매장 연락처
+ * latitude: 매장 위도
+ * longitude: 매장 경도
+ */
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -21,24 +33,24 @@ public class Store extends BaseEntity {
     @Column(name = "store_id")
     private Long id;
     private String name;
-    private Long managerId; // 점장
-    private Long supervisorId; // 본사의 매장 관리자, 감독자
-    private Timestamp openDate; // 오픈 날짜
+    private Long managerId;
+    private Long supervisorId;
+    private Timestamp openDate;
     @ElementCollection
     private List<Long> staffIdList = new ArrayList<>();
     private String mainImg;
     @ElementCollection
     private List<String> imgList = new ArrayList<>();
     private String address;
-    private String wayToCome; // 오시는 길
-    private String businessOpenHours; // 영업시간
-    private String businessCloseHours; // 영업시간
+    private String wayToCome;
+    private String businessOpenHours;
+    private String businessCloseHours;
     private Boolean isParking;
     private Boolean isEcoStore;
     private Boolean isDriveThrough;
-    private String contactNumber; // 매장 연락처
-    private Double latitude; // 위도
-    private Double longitude; // 경도
+    private String contactNumber;
+    private Double latitude;
+    private Double longitude;
 
     @JsonIgnore
     @OneToMany(mappedBy = "store", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)

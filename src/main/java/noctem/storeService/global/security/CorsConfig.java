@@ -20,7 +20,7 @@ public class CorsConfig {
         // AllowCredentials이 true일 때 AllowedOrigin 사용못하므로 AllowedOriginPattern으로 대체
         config.addAllowedOriginPattern("*");
         config.setAllowedHeaders(Arrays.asList("*"));
-        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"));
         source.registerCorsConfiguration("/api/**", config);
         return new CorsFilter(source);
     }

@@ -1,13 +1,13 @@
-package noctem.storeService.domain.store.service;
+package noctem.storeService.store.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import noctem.storeService.domain.store.dto.response.SearchStoreResDto;
-import noctem.storeService.domain.store.dto.response.SoldOutMenuResDto;
-import noctem.storeService.domain.store.dto.response.StoreInfoResDto;
-import noctem.storeService.domain.store.entity.Store;
-import noctem.storeService.domain.store.repository.SoldOutMenuRepository;
-import noctem.storeService.domain.store.repository.StoreRepository;
+import noctem.storeService.store.dto.response.SearchStoreResDto;
+import noctem.storeService.store.dto.response.SoldOutMenuResDto;
+import noctem.storeService.store.dto.response.StoreInfoResDto;
+import noctem.storeService.store.domain.entity.Store;
+import noctem.storeService.store.domain.repository.SoldOutMenuRepository;
+import noctem.storeService.store.domain.repository.StoreRepository;
 import noctem.storeService.global.common.CommonException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -41,7 +41,7 @@ public class StoreServiceImpl implements StoreService {
     }
 
     @Override
-    public List<SearchStoreResDto> searchStore(Double latitude, Double longitude) {
+    public List<SearchStoreResDto> searchNearbyStore(Double latitude, Double longitude) {
         return storeRepository.findDtoByNativeProjections(latitude, longitude)
                 .stream().map(e -> new SearchStoreResDto(e)).collect(Collectors.toList());
     }

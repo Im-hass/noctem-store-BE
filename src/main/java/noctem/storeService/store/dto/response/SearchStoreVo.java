@@ -1,4 +1,4 @@
-package noctem.storeService.domain.store.dto.response;
+package noctem.storeService.store.dto.response;
 
 public interface SearchStoreVo {
     Long getStoreId();
@@ -9,9 +9,9 @@ public interface SearchStoreVo {
 
     String getAddress();
 
-    String getBusinessOpenHours(); // 영업 시작시간
+    String getBusinessOpenHours();
 
-    String getBusinessCloseHours(); // 영업 마강시간
+    String getBusinessCloseHours();
 
     Boolean getIsParking();
 
@@ -19,5 +19,5 @@ public interface SearchStoreVo {
 
     Boolean getIsDriveThrough();
 
-    Integer getDistance(); // 단위 미터(m)
+    Integer getDistance();
 }

@@ -1,6 +1,6 @@
-package noctem.storeService.domain.store.repository;
+package noctem.storeService.store.domain.repository;
 
-import noctem.storeService.domain.store.entity.SoldOutMenu;
+import noctem.storeService.store.domain.entity.SoldOutMenu;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

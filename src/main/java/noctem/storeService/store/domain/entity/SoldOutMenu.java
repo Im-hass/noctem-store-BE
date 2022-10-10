@@ -1,39 +1,36 @@
-package noctem.storeService.domain.store.entity;
+package noctem.storeService.store.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import noctem.storeService.global.common.BaseEntity;
-import noctem.storeService.global.enumeration.OrderStatus;
 
 import javax.persistence.*;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class OrderRequest extends BaseEntity {
+public class SoldOutMenu {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "order_request_id")
+    @Column(name = "sold_out_menu_id")
     private Long id;
-    private Long purchaseId;
-    private OrderStatus orderStatus;
+    private Long menuId;
+
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "store_id")
     private Store store;
 
     @Builder
-    public OrderRequest(Long purchaseId) {
-        this.purchaseId = purchaseId;
-        this.orderStatus = OrderStatus.NOT_CONFIRM;
+    public SoldOutMenu(Long menuId) {
+        this.menuId = menuId;
     }
 
-    public OrderRequest linkToStore(Store store) {
+    public SoldOutMenu linkToStore(Store store) {
         this.store = store;
-        store.linkToOrderRequest(this);
+        store.linkToSoldOutMenu(this);
         return this;
     }
 }

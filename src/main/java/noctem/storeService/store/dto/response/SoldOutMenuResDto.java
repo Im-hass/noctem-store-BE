@@ -1,4 +1,4 @@
-package noctem.storeService.domain.store.dto.response;
+package noctem.storeService.store.dto.response;
 
 import lombok.Data;
 

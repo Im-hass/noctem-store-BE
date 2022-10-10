@@ -1,8 +1,8 @@
 package noctem.storeService;
 
 import lombok.RequiredArgsConstructor;
-import noctem.storeService.domain.store.entity.SoldOutMenu;
-import noctem.storeService.domain.store.entity.Store;
+import noctem.storeService.store.domain.entity.SoldOutMenu;
+import noctem.storeService.store.domain.entity.Store;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
