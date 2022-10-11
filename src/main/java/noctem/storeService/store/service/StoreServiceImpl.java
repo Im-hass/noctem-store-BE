@@ -2,6 +2,7 @@ package noctem.storeService.store.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import noctem.storeService.store.domain.entity.SoldOutMenu;
 import noctem.storeService.store.dto.response.SearchStoreResDto;
 import noctem.storeService.store.dto.response.SoldOutMenuResDto;
 import noctem.storeService.store.dto.response.StoreInfoResDto;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -38,6 +40,20 @@ public class StoreServiceImpl implements StoreService {
     public List<SoldOutMenuResDto> getSoldOutMenu(Long storeId) {
         return soldOutMenuRepository.findAllByStoreId(storeId)
                 .stream().map(e -> new SoldOutMenuResDto(e.getMenuId())).collect(Collectors.toList());
+    }
+
+    @Override
+    public Boolean editSoldOutMenu(Long storeId, Long menuId) {
+        Store store = storeRepository.findById(storeId).get();
+        Map<Long, SoldOutMenu> soldOutMenuMap = store.getSoldOutMenuList().stream()
+                .collect(Collectors.toMap(SoldOutMenu::getMenuId, e -> e));
+        if (soldOutMenuMap.containsKey(menuId)) {
+            store.delSoldOutMenu(soldOutMenuMap.get(menuId));
+        } else {
+            soldOutMenuRepository.save(SoldOutMenu.builder().menuId(menuId).build()
+                    .linkToStoreOwner(store));
+        }
+        return true;
     }
 
     @Override

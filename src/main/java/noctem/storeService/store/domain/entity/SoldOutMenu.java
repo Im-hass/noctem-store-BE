@@ -19,7 +19,7 @@ public class SoldOutMenu {
     private Long menuId;
 
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "store_id")
     private Store store;
 
@@ -28,7 +28,7 @@ public class SoldOutMenu {
         this.menuId = menuId;
     }
 
-    public SoldOutMenu linkToStore(Store store) {
+    public SoldOutMenu linkToStoreOwner(Store store) {
         this.store = store;
         store.linkToSoldOutMenu(this);
         return this;

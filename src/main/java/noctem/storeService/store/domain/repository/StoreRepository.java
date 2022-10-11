@@ -2,11 +2,13 @@ package noctem.storeService.store.domain.repository;
 
 import noctem.storeService.store.dto.response.SearchStoreVo;
 import noctem.storeService.store.domain.entity.Store;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface StoreRepository extends JpaRepository<Store, Long> {
     @Query(value = "SELECT s.store_id AS storeId, " +
@@ -20,4 +22,7 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
             "radians(:longitude))+sin(radians(:latitude))*sin(radians(s.latitude)))) AS distance " +
             "FROM store AS s ORDER BY distance", nativeQuery = true)
     List<SearchStoreVo> findDtoByNativeProjections(@Param("latitude") Double latitude, @Param("longitude") Double longitude);
+
+    @EntityGraph(attributePaths = "soldOutMenuList")
+    Optional<Store> findById(Long id);
 }

@@ -57,7 +57,7 @@ public class Store extends BaseEntity {
     private List<OrderRequest> orderRequestList = new ArrayList<>();
 
     @JsonIgnore
-    @OneToMany(mappedBy = "store", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "store", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SoldOutMenu> soldOutMenuList = new ArrayList<>();
 
     @Builder
@@ -88,6 +88,11 @@ public class Store extends BaseEntity {
 
     public Store linkToSoldOutMenu(SoldOutMenu soldOutMenu) {
         this.soldOutMenuList.add(soldOutMenu);
+        return this;
+    }
+
+    public Store delSoldOutMenu(SoldOutMenu soldOutMenu) {
+        this.soldOutMenuList.remove(soldOutMenu);
         return this;
     }
 }

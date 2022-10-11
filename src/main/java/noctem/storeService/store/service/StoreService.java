@@ -11,5 +11,7 @@ public interface StoreService {
 
     List<SoldOutMenuResDto> getSoldOutMenu(Long storeId);
 
+    Boolean editSoldOutMenu(Long storeId, Long menuId);
+
     List<SearchStoreResDto> searchNearbyStore(Double latitude, Double longitude);
 }

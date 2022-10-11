@@ -81,14 +81,13 @@ public class StoreInit {
             SoldOutMenu soldOutMenu1 = SoldOutMenu.builder()
                     .menuId(1L)
                     .build()
-                    .linkToStore(store2);
+                    .linkToStoreOwner(store2);
 
             SoldOutMenu soldOutMenu2 = SoldOutMenu.builder()
                     .menuId(2L)
                     .build()
-                    .linkToStore(store2);
-            entityManager.persist(soldOutMenu1);
-            entityManager.persist(soldOutMenu2);
+                    .linkToStoreOwner(store2);
+            entityManager.persist(store2);
 
             // 3
             entityManager.persist(

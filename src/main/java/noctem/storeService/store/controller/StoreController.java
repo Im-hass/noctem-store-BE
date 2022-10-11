@@ -6,10 +6,7 @@ import noctem.storeService.global.common.CommonResponse;
 import noctem.storeService.store.dto.response.SearchStoreResDto;
 import noctem.storeService.store.dto.response.SoldOutMenuResDto;
 import noctem.storeService.store.service.StoreService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -33,6 +30,14 @@ public class StoreController {
         dtoList.forEach(e -> e.setIndex(dtoList.indexOf(e)));
         return CommonResponse.builder()
                 .data(dtoList)
+                .build();
+    }
+
+    // @PreAuthorize("hasRole('STORE')")
+    @PatchMapping("/{storeId}/soldOut/{menuId}")
+    public CommonResponse editSoldOutMenu(@PathVariable Long storeId, @PathVariable Long menuId) {
+        return CommonResponse.builder()
+                .data(storeService.editSoldOutMenu(storeId, menuId))
                 .build();
     }
 
