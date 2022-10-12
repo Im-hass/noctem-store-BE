@@ -49,4 +49,11 @@ public class StoreController {
                 .data(dtoList)
                 .build();
     }
+
+    @GetMapping("/{storeId}/receipt")
+    public CommonResponse storeReceiptInfoToFeignClient(@PathVariable Long storeId) {
+        return CommonResponse.builder()
+                .data(storeService.storeReceiptInfoToFeignClient(storeId))
+                .build();
+    }
 }

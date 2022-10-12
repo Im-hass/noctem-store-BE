@@ -10,6 +10,7 @@ import noctem.storeService.store.domain.entity.Store;
 import noctem.storeService.store.domain.repository.SoldOutMenuRepository;
 import noctem.storeService.store.domain.repository.StoreRepository;
 import noctem.storeService.global.common.CommonException;
+import noctem.storeService.store.dto.response.StoreReceiptInfoResDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -60,5 +61,11 @@ public class StoreServiceImpl implements StoreService {
     public List<SearchStoreResDto> searchNearbyStore(Double latitude, Double longitude) {
         return storeRepository.findDtoByNativeProjections(latitude, longitude)
                 .stream().map(e -> new SearchStoreResDto(e)).collect(Collectors.toList());
+    }
+
+    @Override
+    public StoreReceiptInfoResDto storeReceiptInfoToFeignClient(Long storeId) {
+        Store store = storeRepository.findById(storeId).get();
+        return new StoreReceiptInfoResDto(store.getName(), store.getAddress(), store.getContactNumber());
     }
 }

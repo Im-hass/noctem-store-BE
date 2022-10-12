@@ -18,7 +18,8 @@ public class OrderRequest extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "order_request_id")
     private Long id;
-    private Long purchaseId;
+    private Long purchaseNumber;
+    // 주문 메뉴에 대한 정보 or id만 조회?
     private OrderStatus orderStatus;
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
@@ -26,8 +27,8 @@ public class OrderRequest extends BaseEntity {
     private Store store;
 
     @Builder
-    public OrderRequest(Long purchaseId) {
-        this.purchaseId = purchaseId;
+    public OrderRequest(Long purchaseNumber) {
+        this.purchaseNumber = purchaseNumber;
         this.orderStatus = OrderStatus.NOT_CONFIRM;
     }
 
