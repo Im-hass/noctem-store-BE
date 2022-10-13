@@ -16,5 +16,5 @@ public interface StoreService {
 
     List<SearchStoreResDto> searchNearbyStore(Double latitude, Double longitude);
 
-    StoreReceiptInfoResDto storeReceiptInfoToFeignClient(Long storeId);
+    StoreReceiptInfoResDto getStoreReceiptInfoToFeignClient(Long storeId);
 }

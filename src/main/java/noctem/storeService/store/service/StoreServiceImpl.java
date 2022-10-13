@@ -11,6 +11,7 @@ import noctem.storeService.store.domain.repository.SoldOutMenuRepository;
 import noctem.storeService.store.domain.repository.StoreRepository;
 import noctem.storeService.global.common.CommonException;
 import noctem.storeService.store.dto.response.StoreReceiptInfoResDto;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +29,7 @@ public class StoreServiceImpl implements StoreService {
     private final StoreRepository storeRepository;
     private final SoldOutMenuRepository soldOutMenuRepository;
 
+    @Modifying(clearAutomatically = true)
     @Override
     public StoreInfoResDto getStoreInfo(Long storeId) {
         Optional<Store> optionalStore = storeRepository.findById(storeId);
@@ -37,6 +39,7 @@ public class StoreServiceImpl implements StoreService {
         return new StoreInfoResDto(optionalStore.get());
     }
 
+    @Modifying(clearAutomatically = true)
     @Override
     public List<SoldOutMenuResDto> getSoldOutMenu(Long storeId) {
         return soldOutMenuRepository.findAllByStoreId(storeId)
@@ -57,14 +60,16 @@ public class StoreServiceImpl implements StoreService {
         return true;
     }
 
+    @Modifying(clearAutomatically = true)
     @Override
     public List<SearchStoreResDto> searchNearbyStore(Double latitude, Double longitude) {
         return storeRepository.findDtoByNativeProjections(latitude, longitude)
                 .stream().map(e -> new SearchStoreResDto(e)).collect(Collectors.toList());
     }
 
+    @Modifying(clearAutomatically = true)
     @Override
-    public StoreReceiptInfoResDto storeReceiptInfoToFeignClient(Long storeId) {
+    public StoreReceiptInfoResDto getStoreReceiptInfoToFeignClient(Long storeId) {
         Store store = storeRepository.findById(storeId).get();
         return new StoreReceiptInfoResDto(store.getName(), store.getAddress(), store.getContactNumber());
     }

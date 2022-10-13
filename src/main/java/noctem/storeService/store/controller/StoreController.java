@@ -51,9 +51,9 @@ public class StoreController {
     }
 
     @GetMapping("/{storeId}/receipt")
-    public CommonResponse storeReceiptInfoToFeignClient(@PathVariable Long storeId) {
+    public CommonResponse getStoreReceiptInfoToFeignClient(@PathVariable Long storeId) {
         return CommonResponse.builder()
-                .data(storeService.storeReceiptInfoToFeignClient(storeId))
+                .data(storeService.getStoreReceiptInfoToFeignClient(storeId))
                 .build();
     }
 }
