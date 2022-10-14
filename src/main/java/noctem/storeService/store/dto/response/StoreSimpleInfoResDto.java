@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class StoreReceiptInfoResDto {
+public class StoreSimpleInfoResDto {
     private String storeName;
     private String storeAddress;
     private String storeContactNumber;

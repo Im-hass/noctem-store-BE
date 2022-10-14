@@ -10,7 +10,7 @@ import noctem.storeService.store.domain.entity.Store;
 import noctem.storeService.store.domain.repository.SoldOutMenuRepository;
 import noctem.storeService.store.domain.repository.StoreRepository;
 import noctem.storeService.global.common.CommonException;
-import noctem.storeService.store.dto.response.StoreReceiptInfoResDto;
+import noctem.storeService.store.dto.response.StoreSimpleInfoResDto;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -41,6 +41,13 @@ public class StoreServiceImpl implements StoreService {
 
     @Modifying(clearAutomatically = true)
     @Override
+    public StoreSimpleInfoResDto getStoreSimpleInfo(Long storeId) {
+        Store store = storeRepository.findById(storeId).get();
+        return new StoreSimpleInfoResDto(store.getName(), store.getAddress(), store.getContactNumber());
+    }
+
+    @Modifying(clearAutomatically = true)
+    @Override
     public List<SoldOutMenuResDto> getSoldOutMenu(Long storeId) {
         return soldOutMenuRepository.findAllByStoreId(storeId)
                 .stream().map(e -> new SoldOutMenuResDto(e.getMenuId())).collect(Collectors.toList());
@@ -65,12 +72,5 @@ public class StoreServiceImpl implements StoreService {
     public List<SearchStoreResDto> searchNearbyStore(Double latitude, Double longitude) {
         return storeRepository.findDtoByNativeProjections(latitude, longitude)
                 .stream().map(e -> new SearchStoreResDto(e)).collect(Collectors.toList());
-    }
-
-    @Modifying(clearAutomatically = true)
-    @Override
-    public StoreReceiptInfoResDto getStoreReceiptInfoToFeignClient(Long storeId) {
-        Store store = storeRepository.findById(storeId).get();
-        return new StoreReceiptInfoResDto(store.getName(), store.getAddress(), store.getContactNumber());
     }
 }

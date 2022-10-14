@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import noctem.storeService.global.common.BaseEntity;
+import noctem.storeService.global.enumeration.Sex;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -43,8 +44,12 @@ public class Purchase extends BaseEntity {
     private String storeContactNumber;
     private Long userAccountId;
     private String userNickname;
+    private Integer userAge;
+    private Sex userSex;
     private String anonymousName;
     private String anonymousPhoneNumber;
+    private Integer anonymousAge;
+    private Sex anonymousSex;
     private Integer purchaseTotalPrice;
     private Long giftId;
     @ElementCollection
@@ -62,7 +67,7 @@ public class Purchase extends BaseEntity {
     private PaymentInfo paymentInfo;
 
     @Builder
-    public Purchase(Long storeId, Integer storeOrderNumber, String storeName, String storeAddress, String storeContactNumber, Long userAccountId, String userNickname, String anonymousName, String anonymousPhoneNumber, Integer purchaseTotalPrice, Long giftId) {
+    public Purchase(Long storeId, Integer storeOrderNumber, String storeName, String storeAddress, String storeContactNumber, Long userAccountId, String userNickname, Integer userAge, Sex userSex, String anonymousName, String anonymousPhoneNumber, Integer anonymousAge, Sex anonymousSex, Integer purchaseTotalPrice, Long giftId, List<Long> usedGifticonList) {
         this.purchaseSerialNumber = UUID.randomUUID().toString();
         this.storeId = storeId;
         this.storeOrderNumber = storeOrderNumber;
@@ -71,10 +76,15 @@ public class Purchase extends BaseEntity {
         this.storeContactNumber = storeContactNumber;
         this.userAccountId = userAccountId;
         this.userNickname = userNickname;
+        this.userAge = userAge;
+        this.userSex = userSex;
         this.anonymousName = anonymousName;
         this.anonymousPhoneNumber = anonymousPhoneNumber;
+        this.anonymousAge = anonymousAge;
+        this.anonymousSex = anonymousSex;
         this.purchaseTotalPrice = purchaseTotalPrice;
         this.giftId = giftId;
+        this.usedGifticonList = usedGifticonList;
     }
 
     public Purchase linkToPurchaseMenuList(List<PurchaseMenu> purchaseMenuList) {

@@ -24,6 +24,13 @@ public class StoreController {
                 .build();
     }
 
+    @GetMapping("/simpleInfo/{storeId}")
+    public CommonResponse getStoreSimpleInfo(@PathVariable Long storeId) {
+        return CommonResponse.builder()
+                .data(storeService.getStoreSimpleInfo(storeId))
+                .build();
+    }
+
     @GetMapping("/{storeId}/soldOut")
     public CommonResponse getSoldOutMenu(@PathVariable Long storeId) {
         List<SoldOutMenuResDto> dtoList = storeService.getSoldOutMenu(storeId);
@@ -47,13 +54,6 @@ public class StoreController {
         dtoList.forEach(e -> e.setIndex(dtoList.indexOf(e)));
         return CommonResponse.builder()
                 .data(dtoList)
-                .build();
-    }
-
-    @GetMapping("/{storeId}/receipt")
-    public CommonResponse getStoreReceiptInfoToFeignClient(@PathVariable Long storeId) {
-        return CommonResponse.builder()
-                .data(storeService.getStoreReceiptInfoToFeignClient(storeId))
                 .build();
     }
 }
