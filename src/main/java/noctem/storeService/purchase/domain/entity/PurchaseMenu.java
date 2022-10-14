@@ -1,4 +1,4 @@
-package noctem.storeService.store.domain.entity;
+package noctem.storeService.purchase.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;

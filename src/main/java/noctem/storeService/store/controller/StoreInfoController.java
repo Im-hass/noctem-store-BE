@@ -14,7 +14,7 @@ import java.util.List;
 @RestController
 @RequestMapping("${global.api.base-path}/store")
 @RequiredArgsConstructor
-public class StoreController {
+public class StoreInfoController {
     private final StoreService storeService;
 
     @GetMapping("/{storeId}")
@@ -40,7 +40,7 @@ public class StoreController {
                 .build();
     }
 
-    // @PreAuthorize("hasRole('STORE')")
+    //    @PreAuthorize("hasRole('STORE')")
     @PatchMapping("/{storeId}/soldOut/{menuId}")
     public CommonResponse editSoldOutMenu(@PathVariable Long storeId, @PathVariable Long menuId) {
         return CommonResponse.builder()

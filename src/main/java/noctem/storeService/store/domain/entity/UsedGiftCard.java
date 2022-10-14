@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import noctem.storeService.global.common.BaseEntity;
+import noctem.storeService.purchase.domain.entity.Purchase;
 
 import javax.persistence.*;
 

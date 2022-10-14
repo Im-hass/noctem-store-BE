@@ -59,14 +59,12 @@ public class JwtRequestProcessingFilter extends AbstractAuthenticationProcessing
                 }
                 ClientInfoDto clientInfoDto = new ClientInfoDto();
 
-                clientInfoDto.setId(Long.parseLong(allClaims.get(JwtAuthenticationToken.JWT_USER_ID).toString()));
-                clientInfoDto.setNickname(allClaims.get(JwtAuthenticationToken.JWT_NICKNAME).toString());
-                if (allClaims.get(JwtAuthenticationToken.JWT_EMAIL) != null) {
-                    clientInfoDto.setEmail(allClaims.get(JwtAuthenticationToken.JWT_EMAIL).toString());
+                clientInfoDto.setId(Long.parseLong(allClaims.get(JwtAuthenticationToken.JWT_STORE_ACCOUNT_ID).toString()));
+                if (allClaims.get(JwtAuthenticationToken.JWT_ROLE).toString().equals(Role.ROLE_STORE.toString())) {
+                    clientInfoDto.setRole(Role.ROLE_STORE);
                 }
-                if (allClaims.get(JwtAuthenticationToken.JWT_ROLE).toString().equals(Role.ROLE_USER.toString())) {
-                    clientInfoDto.setRole(Role.ROLE_USER);
-                }
+
+                clientInfoDto.setStoreId(Long.parseLong(allClaims.get(JwtAuthenticationToken.JWT_STORE_ID).toString()));
 
                 List<GrantedAuthority> roles = new ArrayList<>();
                 roles.add(new SimpleGrantedAuthority(clientInfoDto.getRole().toString()));

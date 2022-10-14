@@ -1,4 +1,4 @@
-package noctem.storeService.store.domain.entity;
+package noctem.storeService.purchase.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import noctem.storeService.global.common.BaseEntity;
 import noctem.storeService.global.enumeration.Sex;
+import noctem.storeService.store.domain.entity.UsedGiftCard;
 
 import javax.persistence.*;
 import java.util.ArrayList;

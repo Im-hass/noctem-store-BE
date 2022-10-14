@@ -28,7 +28,7 @@ public class SoldOutMenu {
         this.menuId = menuId;
     }
 
-    public SoldOutMenu linkToStoreOwner(Store store) {
+    public SoldOutMenu linkToStoreFromOwner(Store store) {
         this.store = store;
         store.linkToSoldOutMenu(this);
         return this;

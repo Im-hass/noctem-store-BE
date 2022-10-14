@@ -17,28 +17,21 @@ public class ClientInfoLoader {
         return getClientUser() == null;
     }
 
-    public Long getUserAccountId() {
+    public Long getStoreAccountId() {
         if (getClientUser() != null) {
             return getClientUser().getId();
         }
         return null;
     }
 
-    public String getUserNickname() {
+    public Long getStoreId() {
         if (getClientUser() != null) {
-            return getClientUser().getNickname();
+            return getClientUser().getStoreId();
         }
         return null;
     }
 
-    public String getUserEmail() {
-        if (getClientUser() != null) {
-            return getClientUser().getEmail();
-        }
-        return null;
-    }
-
-    public Role getUserRole() {
+    public Role getStoreAccountRole() {
         if (getClientUser() != null) {
             return getClientUser().getRole();
         }

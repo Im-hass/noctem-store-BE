@@ -15,10 +15,11 @@ public class PurchaseKafkaConsumer {
 
     @KafkaListener(topics = PURCHASE_TO_STORE_TOPIC, groupId = "storeGroup")
     public void purchaseConsume(Long purchaseId) {
+        // redis에 제조 상태 저장
         // DB에서 주문정보 조회
         // 매장에 푸시알림
         // 유저에 푸시알림
-        // redis에 확인중 상태저장
+        // redis에 주문확인중 상태 저장
         // redis에 예상시간 +90초
     }
 }

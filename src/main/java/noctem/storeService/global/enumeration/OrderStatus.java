@@ -8,9 +8,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public enum OrderStatus {
-    NOT_CONFIRM("미확인"),
+    NOT_CONFIRM("주문확인중"),
     MAKING("제조중"),
-    COMPLETED("제조완료");
+    COMPLETED("제조완료"),
+    CANCELED("취소됨");
 
     private String value;
 

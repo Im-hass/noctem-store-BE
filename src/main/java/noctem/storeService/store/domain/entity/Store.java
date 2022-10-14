@@ -53,6 +53,10 @@ public class Store extends BaseEntity {
     private Double longitude;
 
     @JsonIgnore
+    @OneToOne(mappedBy = "store", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    public StoreAccount storeAccount;
+
+    @JsonIgnore
     @OneToMany(mappedBy = "store", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     private List<OrderRequest> orderRequestList = new ArrayList<>();
 
@@ -79,6 +83,11 @@ public class Store extends BaseEntity {
         this.contactNumber = contactNumber;
         this.latitude = latitude;
         this.longitude = longitude;
+    }
+
+    public Store linkToStoreAccount(StoreAccount storeAccount) {
+        this.storeAccount = storeAccount;
+        return this;
     }
 
     public Store linkToOrderRequest(OrderRequest orderRequest) {

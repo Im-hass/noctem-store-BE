@@ -1,7 +1,7 @@
 package noctem.storeService.store.domain.repository;
 
-import noctem.storeService.store.dto.response.SearchStoreVo;
 import noctem.storeService.store.domain.entity.Store;
+import noctem.storeService.store.dto.response.SearchStoreVo;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

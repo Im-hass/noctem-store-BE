@@ -32,7 +32,7 @@ public class OrderRequest extends BaseEntity {
         this.orderStatus = OrderStatus.NOT_CONFIRM;
     }
 
-    public OrderRequest linkToStore(Store store) {
+    public OrderRequest linkToStoreFromOwner(Store store) {
         this.store = store;
         store.linkToOrderRequest(this);
         return this;
