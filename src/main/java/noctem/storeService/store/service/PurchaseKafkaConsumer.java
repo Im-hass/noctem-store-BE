@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class PurchaseKafkaConsumer {
     private final String PURCHASE_TO_STORE_TOPIC = "purchase-to-store";
 
-    @KafkaListener(topics = PURCHASE_TO_STORE_TOPIC, groupId = "purchase-to-store")
+    @KafkaListener(topics = PURCHASE_TO_STORE_TOPIC, groupId = "storeGroup")
     public void purchaseConsume(Long purchaseId) {
         // DB에서 주문정보 조회
         // 매장에 푸시알림

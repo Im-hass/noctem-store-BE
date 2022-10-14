@@ -24,13 +24,6 @@ spring:
       destination: config-topic
   kafka:
     bootstrap-servers: http://${KAFKA_SERVER}:9092
-    consumer:
-      auto-offset-reset: earliest
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.apache.kafka.common.serialization.StringSerializer
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://${MYSQL_SERVER}:3306/store?characterEncoding=UTF-8&serverTimezone=Asia/Seoul
