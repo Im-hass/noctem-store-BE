@@ -32,7 +32,7 @@ public class BeverageMakingController {
 
     // 유저의 메뉴 취소요청. '확인중' 상태일 때만 가능. 본인 확인 필.
     // @PreAuthorize("hasRole('USER')")
-    @PatchMapping("/{purchaseId}")
+    @PatchMapping("/{purchaseId}/cancel")
     public CommonResponse cancelPurchase(@PathVariable Long purchaseId) {
         return CommonResponse.builder()
                 .data(true)
