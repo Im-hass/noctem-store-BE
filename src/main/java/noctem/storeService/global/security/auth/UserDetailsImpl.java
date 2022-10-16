@@ -22,11 +22,11 @@ public class UserDetailsImpl implements UserDetails {
         this.loginId = storeAccount.getLoginId();
         this.password = storeAccount.getPassword();
         this.authorities = (List<GrantedAuthority>) authorities;
-        this.clientInfoDto = new ClientInfoDto(storeAccount.getId(), storeAccount.getStore().getId(), storeAccount.getRole());
+        this.clientInfoDto = new ClientInfoDto(storeAccount.getId(), storeAccount.getStore().getId(), null, storeAccount.getRole());
     }
 
     public UserDetailsImpl(ClientInfoDto clientInfoDto, Collection<? extends GrantedAuthority> authorities) {
-        this.id = clientInfoDto.getId();
+        this.id = clientInfoDto.getStoreAccountId();
         this.clientInfoDto = clientInfoDto;
         this.authorities = (List<GrantedAuthority>) authorities;
     }

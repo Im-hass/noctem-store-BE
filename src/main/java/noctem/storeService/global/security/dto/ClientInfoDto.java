@@ -11,7 +11,8 @@ import noctem.storeService.global.enumeration.Role;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ClientInfoDto {
-    private Long id; // StoreAccount.id
+    private Long storeAccountId;
     private Long storeId;
+    private Long userAccountId;
     private Role role;
 }

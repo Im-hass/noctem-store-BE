@@ -48,6 +48,7 @@ public class JwtRequestProcessingFilter extends AbstractAuthenticationProcessing
             chain.doFilter(req, res);
         } else {
             try {
+                // 공통 로직
                 String encodedJwt = req.getHeader(JwtAuthenticationToken.JWT_HEADER).split(" ")[1];
                 Verifier verifier = HMACVerifier.newVerifier(JwtAuthenticationToken.JWT_SIGNER);
                 JWT decodedJwt = JWT.getDecoder().decode(encodedJwt, verifier);
@@ -58,13 +59,17 @@ public class JwtRequestProcessingFilter extends AbstractAuthenticationProcessing
                     throw new InvalidJWTSignatureException();
                 }
                 ClientInfoDto clientInfoDto = new ClientInfoDto();
-
-                clientInfoDto.setId(Long.parseLong(allClaims.get(JwtAuthenticationToken.JWT_STORE_ACCOUNT_ID).toString()));
+                // store token일 경우
                 if (allClaims.get(JwtAuthenticationToken.JWT_ROLE).toString().equals(Role.ROLE_STORE.toString())) {
+                    clientInfoDto.setStoreAccountId(Long.parseLong(allClaims.get(JwtAuthenticationToken.JWT_STORE_ACCOUNT_ID).toString()));
+                    clientInfoDto.setStoreId(Long.parseLong(allClaims.get(JwtAuthenticationToken.JWT_STORE_ID).toString()));
                     clientInfoDto.setRole(Role.ROLE_STORE);
                 }
-
-                clientInfoDto.setStoreId(Long.parseLong(allClaims.get(JwtAuthenticationToken.JWT_STORE_ID).toString()));
+                // user token일 경우
+                if (allClaims.get(JwtAuthenticationToken.JWT_ROLE).toString().equals(Role.ROLE_USER.toString())) {
+                    clientInfoDto.setUserAccountId(Long.parseLong(allClaims.get(JwtAuthenticationToken.JWT_STORE_ACCOUNT_ID).toString()));
+                    clientInfoDto.setRole(Role.ROLE_USER);
+                }
 
                 List<GrantedAuthority> roles = new ArrayList<>();
                 roles.add(new SimpleGrantedAuthority(clientInfoDto.getRole().toString()));

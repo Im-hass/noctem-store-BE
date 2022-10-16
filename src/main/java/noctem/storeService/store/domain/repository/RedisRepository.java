@@ -1,9 +1,21 @@
 package noctem.storeService.store.domain.repository;
 
-public interface RedisRepository {
-    Integer increaseWaitingTime(Long storeId);
+import noctem.storeService.global.enumeration.OrderStatus;
 
-    Integer decreaseWaitingTime(Long storeId);
+public interface RedisRepository {
+    Integer increaseWaitingTime(Long storeId, Integer orderQty);
+
+    Integer decreaseWaitingTime(Long storeId, Integer orderQty);
 
     Integer getWaitingTime(Long storeId);
+
+    String getOrderStatus(Long purchaseId);
+
+    void setOrderStatus(Long purchaseId, OrderStatus orderStatus);
+
+    String getSetOrderStatus(Long purchaseId, OrderStatus orderStatus);
+
+    void setOrderRequestTime(Long purchaseId);
+
+    String getOrderRequestTime(Long purchaseId);
 }

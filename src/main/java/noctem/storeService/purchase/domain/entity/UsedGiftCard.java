@@ -1,4 +1,4 @@
-package noctem.storeService.store.domain.entity;
+package noctem.storeService.purchase.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import noctem.storeService.global.common.BaseEntity;
-import noctem.storeService.purchase.domain.entity.Purchase;
 
 import javax.persistence.*;
 

@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import noctem.storeService.global.common.BaseEntity;
 import noctem.storeService.global.enumeration.Sex;
-import noctem.storeService.store.domain.entity.UsedGiftCard;
 
 import javax.persistence.*;
 import java.util.ArrayList;

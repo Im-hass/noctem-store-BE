@@ -1,4 +1,4 @@
-package noctem.storeService;
+package noctem.storeService.store.domain.repository;
 
 import lombok.RequiredArgsConstructor;
 import noctem.storeService.store.domain.entity.SoldOutMenu;
@@ -18,12 +18,12 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 public class StoreInit {
     private final InitService initService;
-    @Value("${spring.jpa.hibernate.ddl-auto}")
+    @Value("${spring.datasource-store.hbm2ddl.auto}")
     private String ddlAuto;
 
     @PostConstruct
     public void init() {
-        if (ddlAuto.equals("create")) {
+        if (ddlAuto.equals("update")) {
             initService.storeAndSoldOutMenuInit();
         }
     }

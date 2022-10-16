@@ -24,11 +24,18 @@ spring:
       destination: config-topic
   kafka:
     bootstrap-servers: http://${KAFKA_SERVER}:9092
-  datasource:
+  datasource-store:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://${MYSQL_SERVER}:3306/store?characterEncoding=UTF-8&serverTimezone=Asia/Seoul
+    jdbc-url: jdbc:mysql://${MYSQL_SERVER}:3306/store?characterEncoding=UTF-8&serverTimezone=Asia/Seoul
     username: ${NOCTEM_DB_USERNAME}
     password: ${NOCTEM_DB_PASSWORD}
+    hbm2ddl.auto: update
+  datasource-purchase:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    jdbc-url: jdbc:mysql://${MYSQL_SERVER}:3306/purchase?characterEncoding=UTF-8&serverTimezone=Asia/Seoul
+    username: ${NOCTEM_DB_READ_ONLY_USERNAME}
+    password: ${NOCTEM_DB_READ_ONLY_PASSWORD}
+    hbm2ddl.auto: none
   jpa:
     properties:
       hibernate:
@@ -36,7 +43,7 @@ spring:
         query.in_clause_parameter_padding: true
     database: mysql
     database-platform: org.hibernate.dialect.MySQL8Dialect
-    hibernate.ddl-auto: update
+#    hibernate.ddl-auto: update
   redis:
     host: ${REDIS_SERVER}
     port: 6379

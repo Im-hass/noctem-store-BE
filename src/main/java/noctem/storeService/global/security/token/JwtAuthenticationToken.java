@@ -45,7 +45,7 @@ public class JwtAuthenticationToken extends AbstractAuthenticationToken {
         HMACSigner secretKey = HMACSigner.newSHA256Signer(JWT_SIGNER);
         JWT rawJwt = new JWT()
                 .setIssuer(JWT_ISSUER)
-                .addClaim(JWT_STORE_ACCOUNT_ID, clientInfoDto.getId())
+                .addClaim(JWT_STORE_ACCOUNT_ID, clientInfoDto.getStoreAccountId())
                 .addClaim(JWT_STORE_ID, clientInfoDto.getStoreId())
                 .addClaim(JWT_ROLE, clientInfoDto.getRole())
                 .addClaim(JWT_LOGIN_DTTM, simpleDateFormat.format(new Date()))

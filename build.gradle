@@ -2,7 +2,7 @@ plugins {
     id 'org.springframework.boot' version '2.6.8'
     id 'io.spring.dependency-management' version '1.0.14.RELEASE'
     id 'java'
-    id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
+//    id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
     id 'com.google.cloud.tools.jib' version '3.3.0'
 }
 
@@ -26,6 +26,8 @@ jib {
         environment = [
                 "NOCTEM_DB_USERNAME": System.getenv("NOCTEM_DB_USERNAME"),
                 "NOCTEM_DB_PASSWORD": System.getenv("NOCTEM_DB_PASSWORD"),
+                "NOCTEM_DB_READ_ONLY_USERNAME": System.getenv("NOCTEM_DB_READ_ONLY_USERNAME"),
+                "NOCTEM_DB_READ_ONLY_PASSWORD": System.getenv("NOCTEM_DB_READ_ONLY_PASSWORD"),
                 "NOCTEM_JWT_SIGNER" : System.getenv("NOCTEM_JWT_SIGNER"),
                 "EUREKA_SERVER"     : "eureka",
                 "MYSQL_SERVER"      : "mysqldb",
@@ -63,6 +65,7 @@ ext {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.cloud:spring-cloud-starter-config'
@@ -72,9 +75,10 @@ dependencies {
     implementation 'org.springframework.cloud:spring-cloud-starter-bus-kafka'
     implementation 'org.springframework.cloud:spring-cloud-stream-binder-kafka'
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'org.bouncycastle:bcprov-jdk15on:1.70'
     implementation 'io.fusionauth:fusionauth-jwt:5.2.0'
-    implementation "com.querydsl:querydsl-jpa:5.0.0"
-    annotationProcessor "com.querydsl:querydsl-apt:5.0.0"
+//    implementation "com.querydsl:querydsl-jpa:5.0.0"
+//    annotationProcessor "com.querydsl:querydsl-apt:5.0.0"
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
     runtimeOnly 'mysql:mysql-connector-java'
@@ -93,17 +97,17 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
-def querydslDir = "$buildDir/generated/querydsl"
-querydsl {
-    jpa = true
-    querydslSourcesDir = querydslDir
-}
-sourceSets {
-    main.java.srcDir querydslDir
-}
-compileQuerydsl {
-    options.annotationProcessorPath = configurations.querydsl
-}
-configurations {
-    querydsl.extendsFrom compileClasspath
-}
+//def querydslDir = "$buildDir/generated/querydsl"
+//querydsl {
+//    jpa = true
+//    querydslSourcesDir = querydslDir
+//}
+//sourceSets {
+//    main.java.srcDir querydslDir
+//}
+//compileQuerydsl {
+//    options.annotationProcessorPath = configurations.querydsl
+//}
+//configurations {
+//    querydsl.extendsFrom compileClasspath
+//}

@@ -58,7 +58,7 @@ public class StoreServiceImpl implements StoreService {
     public Boolean editSoldOutMenu(Long storeId, Long menuId) {
         Store store = storeRepository.findById(storeId).get();
         // 본인확인
-        identificationStoreId(storeId);
+        identificationByStoreId(storeId);
 
         Map<Long, SoldOutMenu> soldOutMenuMap = store.getSoldOutMenuList().stream()
                 .collect(Collectors.toMap(SoldOutMenu::getMenuId, e -> e));
@@ -78,7 +78,7 @@ public class StoreServiceImpl implements StoreService {
                 .stream().map(e -> new SearchStoreResDto(e)).collect(Collectors.toList());
     }
 
-    private void identificationStoreId(Long storeId) {
+    private void identificationByStoreId(Long storeId) {
         if (clientInfoLoader.getStoreId() != storeId) {
             throw CommonException.builder().errorCode(5004).httpStatus(HttpStatus.BAD_REQUEST).build();
         }

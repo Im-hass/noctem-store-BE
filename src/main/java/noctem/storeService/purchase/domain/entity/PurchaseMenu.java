@@ -25,6 +25,8 @@ public class PurchaseMenu extends BaseEntity {
     private Long sizeId;
     private String menuFullName;
     private String menuShortName;
+    private String temperature;
+    private String size;
     private Integer qty;
     private Integer menuTotalPrice;
     @JsonIgnore
@@ -37,12 +39,14 @@ public class PurchaseMenu extends BaseEntity {
     private Purchase purchase;
 
     @Builder
-    public PurchaseMenu(Long sizeId, String menuFullName, String menuShortName, Integer qty, Integer menuTotalPrice) {
+    public PurchaseMenu(Long sizeId, String menuFullName, String menuShortName, String temperature, String size, Integer qty, Integer menuTotalPrice) {
         this.sizeId = sizeId;
         this.menuFullName = menuFullName;
         this.menuShortName = menuShortName;
         this.qty = qty;
         this.menuTotalPrice = menuTotalPrice;
+        this.temperature = extractTemperature(menuShortName);
+        this.size = extractSize(menuShortName);
     }
 
     public PurchaseMenu linkToPurchase(Purchase purchase) {
@@ -54,5 +58,27 @@ public class PurchaseMenu extends BaseEntity {
         this.purchasePersonalOptionList.addAll(purchasePersonalOptionList);
         purchasePersonalOptionList.forEach(e -> e.linkToPurchaseMenu(this));
         return this;
+    }
+
+    private String extractTemperature(String menuShortName) {
+        char temperatureChar = menuShortName.charAt(0);
+        switch (temperatureChar) {
+            case 'I':
+                return "ICED";
+            default:
+                return "HOT";
+        }
+    }
+
+    private String extractSize(String menuShortName) {
+        char sizeChar = menuShortName.charAt(2);
+        switch (sizeChar) {
+            case 'T':
+                return "Tall";
+            case 'G':
+                return "Grande";
+            default:
+                return "Venti";
+        }
     }
 }
