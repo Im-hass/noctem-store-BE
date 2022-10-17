@@ -8,10 +8,7 @@ import noctem.storeService.store.domain.entity.SoldOutMenu;
 import noctem.storeService.store.domain.entity.Store;
 import noctem.storeService.store.domain.repository.SoldOutMenuRepository;
 import noctem.storeService.store.domain.repository.StoreRepository;
-import noctem.storeService.store.dto.response.SearchStoreResDto;
-import noctem.storeService.store.dto.response.SoldOutMenuResDto;
-import noctem.storeService.store.dto.response.StoreInfoResDto;
-import noctem.storeService.store.dto.response.StoreSimpleInfoResDto;
+import noctem.storeService.store.dto.response.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +35,12 @@ public class StoreServiceImpl implements StoreService {
             throw CommonException.builder().errorCode(5001).httpStatus(HttpStatus.NOT_FOUND).build();
         }
         return new StoreInfoResDto(optionalStore.get());
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public MyStoreInfoResDto getMyStoreInfo() {
+        return new MyStoreInfoResDto(storeRepository.findById(clientInfoLoader.getStoreId()).get());
     }
 
     @Transactional(readOnly = true)

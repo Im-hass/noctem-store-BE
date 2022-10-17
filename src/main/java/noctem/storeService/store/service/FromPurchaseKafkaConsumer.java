@@ -10,11 +10,12 @@ import noctem.storeService.store.domain.repository.RedisRepository;
 import noctem.storeService.store.domain.repository.StoreRepository;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
-@Transactional
+@Transactional(propagation = Propagation.REQUIRES_NEW)
 @RequiredArgsConstructor
 public class FromPurchaseKafkaConsumer {
     private final String PURCHASE_TO_STORE_TOPIC = "purchase-to-store";
@@ -22,18 +23,19 @@ public class FromPurchaseKafkaConsumer {
     private final PurchaseRepository purchaseRepository;
     private final StoreRepository storeRepository;
 
-    @KafkaListener(topics = PURCHASE_TO_STORE_TOPIC, groupId = "storeGroup")
-    public void purchaseConsume(Long purchaseId) {
+    @KafkaListener(topics = PURCHASE_TO_STORE_TOPIC)
+    public void purchaseConsume(String purchaseId) {
+        long longPurchaseId = Long.parseLong(purchaseId);
         log.info("Receive purchaseId through [{}] TOPIC", PURCHASE_TO_STORE_TOPIC);
         // redis 주문 상태 저장
-        redisRepository.getSetOrderStatus(purchaseId, OrderStatus.NOT_CONFIRM);
+        redisRepository.getSetOrderStatus(longPurchaseId, OrderStatus.NOT_CONFIRM);
         // redis 최초 주문요청된 시간 저장
-        redisRepository.setOrderRequestTime(purchaseId);
+        redisRepository.setOrderRequestTime(longPurchaseId);
         // purchase DB에서 주문정보 조회
-        Purchase purchase = purchaseRepository.findById(purchaseId).get();
+        Purchase purchase = purchaseRepository.findById(longPurchaseId).get();
         // mysql에 주문요청 저장
         OrderRequest.builder()
-                .purchaseId(purchaseId)
+                .purchaseId(longPurchaseId)
                 .orderStatus(OrderStatus.NOT_CONFIRM)
                 .build()
                 .linkToStoreFromOwner(storeRepository.findById(purchase.getStoreId()).get());

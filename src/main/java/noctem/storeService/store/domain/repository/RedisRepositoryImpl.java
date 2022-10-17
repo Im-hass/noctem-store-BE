@@ -53,6 +53,7 @@ public class RedisRepositoryImpl implements RedisRepository {
         return redisStringTemplate.opsForValue().getAndSet(key, orderStatus.getValue()); // getSet deprecated됨
     }
 
+    // redis 최초 주문요청된 시간 저장
     @Override
     public void setOrderRequestTime(Long purchaseId) {
         String key = String.format("%s:%d", ORDER_REQUEST_TIME_KEY_PREFIX, purchaseId);

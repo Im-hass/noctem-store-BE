@@ -24,6 +24,13 @@ public class StoreInfoController {
                 .build();
     }
 
+    @GetMapping("/my")
+    public CommonResponse getMyStoreInfo() {
+        return CommonResponse.builder()
+                .data(storeService.getMyStoreInfo())
+                .build();
+    }
+
     @GetMapping("/simpleInfo/{storeId}")
     public CommonResponse getStoreSimpleInfo(@PathVariable Long storeId) {
         return CommonResponse.builder()

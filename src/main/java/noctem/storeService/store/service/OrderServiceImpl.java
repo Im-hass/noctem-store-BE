@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -135,7 +136,7 @@ public class OrderServiceImpl implements OrderService {
     public Boolean cancelOrderByUser(Long purchaseId) {
         // 본인확인
         Purchase purchase = purchaseRepository.findById(purchaseId).get();
-        if (purchase.getUserAccountId() != clientInfoLoader.getUserAccountId()) {
+        if (!Objects.equals(purchase.getUserAccountId(), clientInfoLoader.getUserAccountId())) {
             throw CommonException.builder().errorCode(5004).httpStatus(HttpStatus.UNAUTHORIZED).build();
         }
         String orderStatus = redisRepository.getOrderStatus(purchaseId);
@@ -144,7 +145,7 @@ public class OrderServiceImpl implements OrderService {
             if (OrderStatus.NOT_CONFIRM.getValue().equals(getOrderStatusBeforeSet)) {
                 // '결제 취소' 성공
                 // 유저의 환불 이벤트 발행
-                // 매장에 주문 취소 이벤트 발행
+                // 매장에 주문 취소 푸시알림
                 // 대기시간 감소
                 redisRepository.decreaseWaitingTime(purchase.getStoreId(), purchase.getPurchaseMenuList().size());
                 return true;
@@ -159,7 +160,8 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(readOnly = true)
     @Override
     public WaitingTimeResDto getWaitingTime(Long storeId) {
-        return new WaitingTimeResDto(redisRepository.getWaitingTime(storeId));
+        Integer waitingTime = redisRepository.getWaitingTime(storeId);
+        return waitingTime == null ? new WaitingTimeResDto(0) : new WaitingTimeResDto(waitingTime);
     }
 
     private void increaseUserExp(Long userAccountId, Integer purchaseTotalPrice) {
