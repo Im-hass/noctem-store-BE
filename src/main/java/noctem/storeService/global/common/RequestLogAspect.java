@@ -22,10 +22,13 @@ public class RequestLogAspect {
     @Around("execution(* noctem.storeService.store..*Controller.*(..))")
     public Object requestControllerLog(ProceedingJoinPoint joinPoint) throws Throwable {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+        Object target = joinPoint.getTarget();
         if (clientInfoLoader.isAnonymous() == true) {
-            log.info("[ANONYMOUS] {} {}", request.getMethod(), request.getRequestURI());
-        } else {
-            log.info("[{}] {} {}", clientInfoLoader.getStoreAccountId(), request.getMethod(), request.getRequestURI());
+            log.info("[ANONYMOUS] {} {} {}", request.getMethod(), request.getRequestURI(), target.getClass().getSimpleName());
+        } else if (clientInfoLoader.isUser()) {
+            log.info("[USER]({} {}) {} {}", clientInfoLoader.getUserAccountId(), clientInfoLoader.getUserNickname(), request.getMethod(), request.getRequestURI());
+        } else if (clientInfoLoader.isStore()) {
+            log.info("[STORE](accountId={} storeId={}) {} {}", clientInfoLoader.getStoreAccountId(), clientInfoLoader.getStoreId(), request.getMethod(), request.getRequestURI());
         }
         return joinPoint.proceed();
     }

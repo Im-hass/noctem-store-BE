@@ -8,8 +8,8 @@ import java.util.List;
 
 public interface OrderRequestRepository extends JpaRepository<OrderRequest, Long> {
     // 주문확인중, 제조중 조회시 빠른 시간순으로 정렬
-    List<OrderRequest> findAllByOrderStatusAndStoreIdOrderByCreatedAtAsc(OrderStatus orderStatus, Long storeId);
+    List<OrderRequest> findAllByOrderStatusAndStoreIdOrderByOrderRequestDttmAsc(OrderStatus orderStatus, Long storeId);
 
     // 제조완료 조회시 최근 시간순으로 정렬하여 5개만 가져옴
-    List<OrderRequest> findTop5ByOrderStatusAndStoreIdOrderByCreatedAtDesc(OrderStatus orderStatus, Long storeId);
+    List<OrderRequest> findTop5ByOrderStatusAndStoreIdOrderByOrderRequestDttmDesc(OrderStatus orderStatus, Long storeId);
 }

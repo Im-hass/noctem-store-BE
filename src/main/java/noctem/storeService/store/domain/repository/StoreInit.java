@@ -23,7 +23,7 @@ public class StoreInit {
 
     @PostConstruct
     public void init() {
-        if (ddlAuto.equals("update")) {
+        if (ddlAuto.equals("create")) {
             initService.storeAndSoldOutMenuInit();
         }
     }

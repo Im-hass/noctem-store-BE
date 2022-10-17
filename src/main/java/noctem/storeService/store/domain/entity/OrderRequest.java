@@ -9,6 +9,7 @@ import noctem.storeService.global.common.BaseEntity;
 import noctem.storeService.global.enumeration.OrderStatus;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -20,6 +21,7 @@ public class OrderRequest extends BaseEntity {
     private Long id;
     private Long purchaseId;
     private OrderStatus orderStatus;
+    private LocalDateTime orderRequestDttm;
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "store_id")
@@ -29,6 +31,7 @@ public class OrderRequest extends BaseEntity {
     public OrderRequest(Long purchaseId, OrderStatus orderStatus) {
         this.purchaseId = purchaseId;
         this.orderStatus = orderStatus;
+        this.orderRequestDttm = LocalDateTime.now();
     }
 
     public OrderRequest linkToStoreFromOwner(Store store) {

@@ -52,7 +52,7 @@ public class PurchaseDbConfig {
         em.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
         Map<String, Object> properties = new HashMap<>();
         properties.put("hibernate.implicit_naming_strategy", SpringImplicitNamingStrategy.class.getName());
-        properties.put("hibernate.hbm2ddl.auto", env.getProperty("spring.database-purchase.hbm2ddl.auto"));
+        properties.put("hibernate.hbm2ddl.auto", "none");
         properties.put("hibernate.dialect", env.getProperty("spring.jpa.database-platform"));
         em.setJpaPropertyMap(properties);
         return em;

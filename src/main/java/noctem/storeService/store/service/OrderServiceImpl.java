@@ -42,7 +42,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(readOnly = true)
     @Override
     public List<OrderRequestResDto> getNotConfirmOrders() {
-        List<OrderRequest> notConfirmOrderList = orderRequestRepository.findAllByOrderStatusAndStoreIdOrderByCreatedAtAsc(OrderStatus.NOT_CONFIRM, clientInfoLoader.getStoreId());
+        List<OrderRequest> notConfirmOrderList = orderRequestRepository.findAllByOrderStatusAndStoreIdOrderByOrderRequestDttmAsc(OrderStatus.NOT_CONFIRM, clientInfoLoader.getStoreId());
 
         List<Purchase> purchaseList = purchaseRepository.findAllByIdIn(
                 notConfirmOrderList.stream().map(OrderRequest::getPurchaseId).collect(Collectors.toList()));
@@ -55,7 +55,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(readOnly = true)
     @Override
     public List<OrderRequestResDto> getMakingOrders() {
-        List<OrderRequest> makingOrderList = orderRequestRepository.findAllByOrderStatusAndStoreIdOrderByCreatedAtAsc(OrderStatus.MAKING, clientInfoLoader.getStoreId());
+        List<OrderRequest> makingOrderList = orderRequestRepository.findAllByOrderStatusAndStoreIdOrderByOrderRequestDttmAsc(OrderStatus.MAKING, clientInfoLoader.getStoreId());
 
         List<Purchase> purchaseList = purchaseRepository.findAllByIdIn(
                 makingOrderList.stream().map(OrderRequest::getPurchaseId).collect(Collectors.toList()));
@@ -68,7 +68,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(readOnly = true)
     @Override
     public List<OrderRequestResDto> getCompletedOrders() {
-        List<OrderRequest> completedOrderList = orderRequestRepository.findAllByOrderStatusAndStoreIdOrderByCreatedAtAsc(OrderStatus.COMPLETED, clientInfoLoader.getStoreId());
+        List<OrderRequest> completedOrderList = orderRequestRepository.findAllByOrderStatusAndStoreIdOrderByOrderRequestDttmAsc(OrderStatus.COMPLETED, clientInfoLoader.getStoreId());
 
         List<Purchase> purchaseList = purchaseRepository.findAllByIdIn(
                 completedOrderList.stream().map(OrderRequest::getPurchaseId).collect(Collectors.toList()));

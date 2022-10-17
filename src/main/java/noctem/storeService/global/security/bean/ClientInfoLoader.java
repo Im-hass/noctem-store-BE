@@ -17,32 +17,36 @@ public class ClientInfoLoader {
         return getClientUser() == null;
     }
 
-    public Long getStoreAccountId() {
-        if (getClientUser() != null) {
-            return getClientUser().getStoreAccountId();
-        }
-        return null;
+    public boolean isUser() {
+        return getUserAccountId() != null;
     }
 
-    public Long getStoreId() {
-        if (getClientUser() != null) {
-            return getClientUser().getStoreId();
-        }
-        return null;
+    public boolean isStore() {
+        return getStoreAccountId() != null;
     }
 
     public Long getUserAccountId() {
-        if (getClientUser() != null) {
-            return getClientUser().getUserAccountId();
-        }
-        return null;
+        return getClientUser() == null ? null : getClientUser().getUserAccountId();
+    }
+
+    public String getUserNickname() {
+        return getClientUser() == null ? null : getClientUser().getNickname();
+    }
+
+    public String getUserEmail() {
+        return getClientUser() == null ? null : getClientUser().getEmail();
+    }
+
+    public Long getStoreAccountId() {
+        return getClientUser() == null ? null : getClientUser().getStoreAccountId();
+    }
+
+    public Long getStoreId() {
+        return getClientUser() == null ? null : getClientUser().getStoreId();
     }
 
     public Role getClientRole() {
-        if (getClientUser() != null) {
-            return getClientUser().getRole();
-        }
-        return null;
+        return getClientUser() == null ? null : getClientUser().getRole();
     }
 
     private ClientInfoDto getClientUser() {

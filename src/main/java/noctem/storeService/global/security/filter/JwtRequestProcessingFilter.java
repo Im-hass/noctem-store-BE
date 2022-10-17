@@ -58,7 +58,7 @@ public class JwtRequestProcessingFilter extends AbstractAuthenticationProcessing
                 if (!allClaims.get("iss").toString().equals(JwtAuthenticationToken.JWT_ISSUER)) {
                     throw new InvalidJWTSignatureException();
                 }
-                ClientInfoDto clientInfoDto = new ClientInfoDto();
+                ClientInfoDto clientInfoDto = ClientInfoDto.builder().build();
                 // store token일 경우
                 if (allClaims.get(JwtAuthenticationToken.JWT_ROLE).toString().equals(Role.ROLE_STORE.toString())) {
                     clientInfoDto.setStoreAccountId(Long.parseLong(allClaims.get(JwtAuthenticationToken.JWT_STORE_ACCOUNT_ID).toString()));
@@ -67,7 +67,9 @@ public class JwtRequestProcessingFilter extends AbstractAuthenticationProcessing
                 }
                 // user token일 경우
                 if (allClaims.get(JwtAuthenticationToken.JWT_ROLE).toString().equals(Role.ROLE_USER.toString())) {
-                    clientInfoDto.setUserAccountId(Long.parseLong(allClaims.get(JwtAuthenticationToken.JWT_STORE_ACCOUNT_ID).toString()));
+                    clientInfoDto.setUserAccountId(Long.parseLong(allClaims.get(JwtAuthenticationToken.JWT_USER_ACCOUNT_ID).toString()));
+                    clientInfoDto.setNickname(allClaims.get(JwtAuthenticationToken.JWT_NICKNAME).toString());
+                    clientInfoDto.setEmail(allClaims.get(JwtAuthenticationToken.JWT_EMAIL).toString());
                     clientInfoDto.setRole(Role.ROLE_USER);
                 }
 

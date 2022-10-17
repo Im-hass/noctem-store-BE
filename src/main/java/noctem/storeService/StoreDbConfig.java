@@ -56,7 +56,7 @@ public class StoreDbConfig {
         em.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
         Map<String, Object> properties = new HashMap<>();
         properties.put("hibernate.implicit_naming_strategy", SpringImplicitNamingStrategy.class.getName());
-        properties.put("hibernate.hbm2ddl.auto", env.getProperty("spring.database-store.hbm2ddl.auto"));
+        properties.put("hibernate.hbm2ddl.auto", "create");
         properties.put("hibernate.dialect", env.getProperty("spring.jpa.database-platform"));
         em.setJpaPropertyMap(properties);
         return em;

@@ -29,7 +29,7 @@ spring:
     jdbc-url: jdbc:mysql://${MYSQL_SERVER}:3306/store?characterEncoding=UTF-8&serverTimezone=Asia/Seoul
     username: ${NOCTEM_DB_USERNAME}
     password: ${NOCTEM_DB_PASSWORD}
-    hbm2ddl.auto: update
+    hbm2ddl.auto: create
   datasource-purchase:
     driver-class-name: com.mysql.cj.jdbc.Driver
     jdbc-url: jdbc:mysql://${MYSQL_SERVER}:3306/purchase?characterEncoding=UTF-8&serverTimezone=Asia/Seoul
