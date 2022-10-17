@@ -35,7 +35,7 @@ public class Purchase extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "purchase_id")
     private Long id;
-    private String noctemCEO = "박찬우";
+    private String noctemCeo = "박찬우";
     private String purchaseSerialNumber;
     private Long storeId;
     private Integer storeOrderNumber;
