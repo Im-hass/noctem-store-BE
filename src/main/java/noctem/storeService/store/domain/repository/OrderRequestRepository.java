@@ -13,5 +13,5 @@ public interface OrderRequestRepository extends JpaRepository<OrderRequest, Long
     // 제조완료 조회시 최근 시간순으로 정렬하여 5개만 가져옴
     List<OrderRequest> findTop5ByOrderStatusAndStoreIdAndIsDeletedFalseOrderByOrderRequestDttmDesc(OrderStatus orderStatus, Long storeId);
 
-    OrderRequest findByPurchaseIdAndOrderStatusAndIsDeletedFalse(OrderStatus orderStatus, Long purchaseId);
+    OrderRequest findByOrderStatusAndPurchaseIdAndIsDeletedFalse(OrderStatus orderStatus, Long purchaseId);
 }

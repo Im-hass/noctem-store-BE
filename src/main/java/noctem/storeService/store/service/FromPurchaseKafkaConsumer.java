@@ -29,7 +29,7 @@ public class FromPurchaseKafkaConsumer {
         long purchaseId = Long.parseLong(stringPurchaseId);
         log.info("Receive purchaseId={} through [{}] TOPIC", purchaseId, PURCHASE_TO_STORE_TOPIC);
         // redis 주문 상태 저장
-        redisRepository.getSetOrderStatus(purchaseId, OrderStatus.NOT_CONFIRM);
+        redisRepository.setOrderStatus(purchaseId, OrderStatus.NOT_CONFIRM);
         // redis 최초 주문요청된 시간 저장
         redisRepository.setOrderRequestTime(purchaseId);
         // purchase DB에서 주문정보 조회

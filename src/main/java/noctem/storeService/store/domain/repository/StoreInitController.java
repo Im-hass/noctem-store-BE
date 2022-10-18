@@ -24,6 +24,7 @@ public class StoreInitController {
     public void storeCreate() {
         if (count == 0) {
             initService.storeAndSoldOutMenuInit();
+            count++;
         }
     }
 
