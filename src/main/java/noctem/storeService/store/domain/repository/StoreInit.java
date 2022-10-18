@@ -57,8 +57,8 @@ public class StoreInit {
                     .build();
 
             StoreAccount storeAccount1 = StoreAccount.builder()
-                    .loginId("spharos1")
-                    .password(passwordEncoder.encode("spharos"))
+                    .loginId("noctem1")
+                    .password(passwordEncoder.encode("noctem"))
                     .build()
                     .linkToStoreInfoFromOwner(store1);
 
@@ -93,8 +93,8 @@ public class StoreInit {
                     .linkToStore(store2);
 
             StoreAccount storeAccount2 = StoreAccount.builder()
-                    .loginId("spharos2")
-                    .password(passwordEncoder.encode("spharos"))
+                    .loginId("noctem2")
+                    .password(passwordEncoder.encode("noctem"))
                     .build()
                     .linkToStoreInfoFromOwner(store2);
 
@@ -117,8 +117,8 @@ public class StoreInit {
                     .longitude(129.13277373161017)
                     .build();
             StoreAccount storeAccount3 = StoreAccount.builder()
-                    .loginId("spharos3")
-                    .password(passwordEncoder.encode("spharos"))
+                    .loginId("noctem3")
+                    .password(passwordEncoder.encode("noctem"))
                     .build()
                     .linkToStoreInfoFromOwner(store3);
 
@@ -141,8 +141,8 @@ public class StoreInit {
                     .longitude(129.13156497092996)
                     .build();
             StoreAccount storeAccount4 = StoreAccount.builder()
-                    .loginId("spharos4")
-                    .password(passwordEncoder.encode("spharos"))
+                    .loginId("noctem4")
+                    .password(passwordEncoder.encode("noctem"))
                     .build()
                     .linkToStoreInfoFromOwner(store4);
 
@@ -165,8 +165,8 @@ public class StoreInit {
                     .longitude(129.12905990871567)
                     .build();
             StoreAccount storeAccount5 = StoreAccount.builder()
-                    .loginId("spharos5")
-                    .password(passwordEncoder.encode("spharos"))
+                    .loginId("noctem5")
+                    .password(passwordEncoder.encode("noctem"))
                     .build()
                     .linkToStoreInfoFromOwner(store5);
 
@@ -189,8 +189,8 @@ public class StoreInit {
                     .longitude(129.13543014930673)
                     .build();
             StoreAccount storeAccount6 = StoreAccount.builder()
-                    .loginId("spharos6")
-                    .password(passwordEncoder.encode("spharos"))
+                    .loginId("noctem6")
+                    .password(passwordEncoder.encode("noctem"))
                     .build()
                     .linkToStoreInfoFromOwner(store6);
 
@@ -213,8 +213,8 @@ public class StoreInit {
                     .longitude(129.1285701904376)
                     .build();
             StoreAccount storeAccount7 = StoreAccount.builder()
-                    .loginId("spharos7")
-                    .password(passwordEncoder.encode("spharos"))
+                    .loginId("noctem7")
+                    .password(passwordEncoder.encode("noctem"))
                     .build()
                     .linkToStoreInfoFromOwner(store7);
 
