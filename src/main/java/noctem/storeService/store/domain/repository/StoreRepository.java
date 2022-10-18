@@ -23,6 +23,7 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
             "FROM store AS s ORDER BY distance", nativeQuery = true)
     List<SearchStoreVo> findDtoByNativeProjections(@Param("latitude") Double latitude, @Param("longitude") Double longitude);
 
-    @EntityGraph(attributePaths = "soldOutMenuList")
+    @Override
+    @EntityGraph(attributePaths = {"storeAccount", "orderRequestList"})
     Optional<Store> findById(Long id);
 }

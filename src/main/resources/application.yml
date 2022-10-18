@@ -23,8 +23,7 @@ spring:
         enabled: true
       destination: config-topic
   kafka:
-#    bootstrap-servers: http://${KAFKA_SERVER}:9092
-    bootstrap-servers: http://10.10.10.162:9092
+    bootstrap-servers: http://${KAFKA_SERVER}:9092
     consumer:
       group-id: storeGroup
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer

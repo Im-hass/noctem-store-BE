@@ -28,9 +28,8 @@ public class SoldOutMenu {
         this.menuId = menuId;
     }
 
-    public SoldOutMenu linkToStoreFromOwner(Store store) {
+    public SoldOutMenu linkToStore(Store store) {
         this.store = store;
-        store.linkToSoldOutMenu(this);
         return this;
     }
 }

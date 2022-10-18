@@ -23,7 +23,7 @@ public class OrderRequest extends BaseEntity {
     private OrderStatus orderStatus;
     private LocalDateTime orderRequestDttm;
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "store_id")
     private Store store;
 
@@ -34,9 +34,8 @@ public class OrderRequest extends BaseEntity {
         this.orderRequestDttm = LocalDateTime.now();
     }
 
-    public OrderRequest linkToStoreFromOwner(Store store) {
+    public OrderRequest linkToStore(Store store) {
         this.store = store;
-        store.linkToOrderRequest(this);
         return this;
     }
 }

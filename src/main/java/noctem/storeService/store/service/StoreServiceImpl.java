@@ -69,7 +69,7 @@ public class StoreServiceImpl implements StoreService {
             store.delSoldOutMenu(soldOutMenuMap.get(menuId));
         } else {
             soldOutMenuRepository.save(SoldOutMenu.builder().menuId(menuId).build()
-                    .linkToStoreFromOwner(store));
+                    .linkToStore(store));
         }
         return true;
     }

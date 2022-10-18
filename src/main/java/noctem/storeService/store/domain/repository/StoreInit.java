@@ -85,12 +85,12 @@ public class StoreInit {
             SoldOutMenu soldOutMenu1 = SoldOutMenu.builder()
                     .menuId(1L)
                     .build()
-                    .linkToStoreFromOwner(store2);
+                    .linkToStore(store2);
 
             SoldOutMenu soldOutMenu2 = SoldOutMenu.builder()
                     .menuId(2L)
                     .build()
-                    .linkToStoreFromOwner(store2);
+                    .linkToStore(store2);
 
             StoreAccount storeAccount2 = StoreAccount.builder()
                     .loginId("spharos2")

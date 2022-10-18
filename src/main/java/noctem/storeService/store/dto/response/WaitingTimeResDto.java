@@ -6,5 +6,5 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class WaitingTimeResDto {
-    private Integer waitingTime;
+    private Long waitingTime;
 }

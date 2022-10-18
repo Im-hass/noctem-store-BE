@@ -53,11 +53,11 @@ public class Store extends BaseEntity {
     private Double longitude;
 
     @JsonIgnore
-    @OneToOne(mappedBy = "store", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @OneToOne(mappedBy = "store", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     public StoreAccount storeAccount;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "store", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "store", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<OrderRequest> orderRequestList = new ArrayList<>();
 
     @JsonIgnore
@@ -92,11 +92,13 @@ public class Store extends BaseEntity {
 
     public Store linkToOrderRequest(OrderRequest orderRequest) {
         this.orderRequestList.add(orderRequest);
+        orderRequest.linkToStore(this);
         return this;
     }
 
     public Store linkToSoldOutMenu(SoldOutMenu soldOutMenu) {
         this.soldOutMenuList.add(soldOutMenu);
+        soldOutMenu.linkToStore(this);
         return this;
     }
 

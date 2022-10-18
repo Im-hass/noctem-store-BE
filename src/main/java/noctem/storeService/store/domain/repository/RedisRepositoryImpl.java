@@ -17,24 +17,24 @@ public class RedisRepositoryImpl implements RedisRepository {
     private final String WAITING_TIME_KEY_PREFIX = "waitingTime";
     private final String ORDER_STATUS_KEY_PREFIX = "orderStatus";
     private final String ORDER_REQUEST_TIME_KEY_PREFIX = "orderRequestTime";
-    private final RedisTemplate<String, Integer> redisIntegerTemplate;
+    private final RedisTemplate<String, Long> redisLongTemplate;
     private final RedisTemplate<String, String> redisStringTemplate;
 
-    public Integer increaseWaitingTime(Long storeId, Integer orderQty) {
+    public Long increaseWaitingTime(Long storeId, Integer orderQty) {
         String key = String.format("%s:%d", WAITING_TIME_KEY_PREFIX, storeId);
-        redisIntegerTemplate.opsForValue().increment(key, orderQty * 90L);
-        return redisIntegerTemplate.opsForValue().get(key);
+        redisLongTemplate.opsForValue().increment(key, orderQty * 90L);
+        return redisLongTemplate.opsForValue().get(key);
     }
 
-    public Integer decreaseWaitingTime(Long storeId, Integer orderQty) {
+    public Long decreaseWaitingTime(Long storeId, Integer orderQty) {
         String key = String.format("%s:%d", WAITING_TIME_KEY_PREFIX, storeId);
-        redisIntegerTemplate.opsForValue().decrement(key, orderQty * 90L);
-        return redisIntegerTemplate.opsForValue().get(key);
+        redisLongTemplate.opsForValue().decrement(key, orderQty * 90L);
+        return redisLongTemplate.opsForValue().get(key);
     }
 
-    public Integer getWaitingTime(Long storeId) {
+    public Long getWaitingTime(Long storeId) {
         String key = String.format("%s:%d", WAITING_TIME_KEY_PREFIX, storeId);
-        return redisIntegerTemplate.opsForValue().get(key);
+        return redisLongTemplate.opsForValue().get(key);
     }
 
     public String getOrderStatus(Long purchaseId) {

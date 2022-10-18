@@ -6,6 +6,7 @@ import noctem.storeService.global.enumeration.OrderStatus;
 import noctem.storeService.purchase.domain.entity.Purchase;
 import noctem.storeService.purchase.domain.repository.PurchaseRepository;
 import noctem.storeService.store.domain.entity.OrderRequest;
+import noctem.storeService.store.domain.entity.Store;
 import noctem.storeService.store.domain.repository.RedisRepository;
 import noctem.storeService.store.domain.repository.StoreRepository;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -24,24 +25,27 @@ public class FromPurchaseKafkaConsumer {
     private final StoreRepository storeRepository;
 
     @KafkaListener(topics = PURCHASE_TO_STORE_TOPIC)
-    public void purchaseConsume(String purchaseId) {
-        long longPurchaseId = Long.parseLong(purchaseId);
-        log.info("Receive purchaseId through [{}] TOPIC", PURCHASE_TO_STORE_TOPIC);
+    public void purchaseConsume(String stringPurchaseId) {
+        long purchaseId = Long.parseLong(stringPurchaseId);
+        log.info("Receive purchaseId={} through [{}] TOPIC", purchaseId, PURCHASE_TO_STORE_TOPIC);
         // redis 주문 상태 저장
-        redisRepository.getSetOrderStatus(longPurchaseId, OrderStatus.NOT_CONFIRM);
+        redisRepository.getSetOrderStatus(purchaseId, OrderStatus.NOT_CONFIRM);
         // redis 최초 주문요청된 시간 저장
-        redisRepository.setOrderRequestTime(longPurchaseId);
+        redisRepository.setOrderRequestTime(purchaseId);
         // purchase DB에서 주문정보 조회
-        Purchase purchase = purchaseRepository.findById(longPurchaseId).get();
+        Purchase purchase = purchaseRepository.findById(purchaseId).get();
         // mysql에 주문요청 저장
-        OrderRequest.builder()
-                .purchaseId(longPurchaseId)
-                .orderStatus(OrderStatus.NOT_CONFIRM)
-                .build()
-                .linkToStoreFromOwner(storeRepository.findById(purchase.getStoreId()).get());
-        // 매장에 푸시알림
-        // 유저에 푸시알림
+        Store store = storeRepository.findById(purchase.getStoreId()).get();
+        store.linkToOrderRequest(
+                OrderRequest.builder()
+                        .purchaseId(purchaseId)
+                        .orderStatus(OrderStatus.NOT_CONFIRM)
+                        .build()
+        );
         // redis에 예상시간 추가. 메뉴 1개당 +90초
         redisRepository.increaseWaitingTime(purchase.getStoreId(), purchase.getPurchaseMenuList().size());
+        // 매장에 푸시알림
+        // 유저에 푸시알림
+        log.info("Kafka consume process done. purchaseId={} through [{}] TOPIC", purchaseId, PURCHASE_TO_STORE_TOPIC);
     }
 }

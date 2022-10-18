@@ -97,7 +97,7 @@ public class OrderServiceImpl implements OrderService {
                         .purchaseId(purchaseId)
                         .orderStatus(OrderStatus.MAKING)
                         .build()
-                        .linkToStoreFromOwner(storeRepository.findById(clientInfoLoader.getStoreId()).get());
+                        .linkToStore(storeRepository.findById(clientInfoLoader.getStoreId()).get());
                 // 유저에게 push 알림
                 return true;
             } else {
@@ -120,7 +120,7 @@ public class OrderServiceImpl implements OrderService {
                     .purchaseId(purchaseId)
                     .orderStatus(OrderStatus.COMPLETED)
                     .build()
-                    .linkToStoreFromOwner(storeRepository.findById(purchase.getStoreId()).get());
+                    .linkToStore(storeRepository.findById(purchase.getStoreId()).get());
             // 대기시간 감소
             redisRepository.decreaseWaitingTime(purchase.getStoreId(), purchase.getPurchaseMenuList().size());
             // 유저 등급 경험치 반영
@@ -160,8 +160,8 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(readOnly = true)
     @Override
     public WaitingTimeResDto getWaitingTime(Long storeId) {
-        Integer waitingTime = redisRepository.getWaitingTime(storeId);
-        return waitingTime == null ? new WaitingTimeResDto(0) : new WaitingTimeResDto(waitingTime);
+        Long waitingTime = redisRepository.getWaitingTime(storeId);
+        return waitingTime == null ? new WaitingTimeResDto(0L) : new WaitingTimeResDto(waitingTime);
     }
 
     private void increaseUserExp(Long userAccountId, Integer purchaseTotalPrice) {
