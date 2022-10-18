@@ -4,26 +4,25 @@ import lombok.RequiredArgsConstructor;
 import noctem.storeService.store.domain.entity.SoldOutMenu;
 import noctem.storeService.store.domain.entity.Store;
 import noctem.storeService.store.domain.entity.StoreAccount;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import java.sql.Timestamp;
 import java.util.Arrays;
 
-@Component
+@RestController
 @RequiredArgsConstructor
-public class StoreInit {
+public class StoreInitController {
     private final InitService initService;
-    @Value("${spring.datasource-store.hbm2ddl.auto}")
-    private String ddlAuto;
+    private int count = 0;
 
-    @PostConstruct
-    public void init() {
-        if (ddlAuto.equals("create")) {
+    @PostMapping("${global.api.base-path}/init")
+    public void storeCreate() {
+        if (count == 0) {
             initService.storeAndSoldOutMenuInit();
         }
     }

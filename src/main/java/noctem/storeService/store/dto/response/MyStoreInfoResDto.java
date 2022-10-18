@@ -5,7 +5,6 @@ import lombok.Data;
 import noctem.storeService.store.domain.entity.Store;
 
 import java.text.SimpleDateFormat;
-import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -14,7 +13,6 @@ public class MyStoreInfoResDto {
     private Long supervisorId;
     private String name;
     private String mainImg;
-    private List<String> imgList;
     private String address;
     private String wayToCome;
     private String businessOpenHours;
@@ -30,7 +28,6 @@ public class MyStoreInfoResDto {
         this.supervisorId = store.getSupervisorId();
         this.name = store.getName();
         this.mainImg = store.getMainImg();
-        this.imgList = store.getImgList();
         this.address = store.getAddress();
         this.wayToCome = store.getWayToCome();
         this.businessOpenHours = store.getBusinessOpenHours();

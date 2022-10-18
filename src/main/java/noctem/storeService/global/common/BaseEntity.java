@@ -26,4 +26,9 @@ public abstract class BaseEntity {
 
     @JsonIgnore
     private Boolean isDeleted = false;
+
+    public BaseEntity delete() {
+        this.isDeleted = true;
+        return this;
+    }
 }

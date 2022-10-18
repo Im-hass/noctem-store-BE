@@ -43,7 +43,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(readOnly = true)
     @Override
     public List<OrderRequestResDto> getNotConfirmOrders() {
-        List<OrderRequest> notConfirmOrderList = orderRequestRepository.findAllByOrderStatusAndStoreIdOrderByOrderRequestDttmAsc(OrderStatus.NOT_CONFIRM, clientInfoLoader.getStoreId());
+        List<OrderRequest> notConfirmOrderList = orderRequestRepository.findAllByOrderStatusAndStoreIdAndIsDeletedFalseOrderByOrderRequestDttmAsc(OrderStatus.NOT_CONFIRM, clientInfoLoader.getStoreId());
 
         List<Purchase> purchaseList = purchaseRepository.findAllByIdIn(
                 notConfirmOrderList.stream().map(OrderRequest::getPurchaseId).collect(Collectors.toList()));
@@ -56,7 +56,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(readOnly = true)
     @Override
     public List<OrderRequestResDto> getMakingOrders() {
-        List<OrderRequest> makingOrderList = orderRequestRepository.findAllByOrderStatusAndStoreIdOrderByOrderRequestDttmAsc(OrderStatus.MAKING, clientInfoLoader.getStoreId());
+        List<OrderRequest> makingOrderList = orderRequestRepository.findAllByOrderStatusAndStoreIdAndIsDeletedFalseOrderByOrderRequestDttmAsc(OrderStatus.MAKING, clientInfoLoader.getStoreId());
 
         List<Purchase> purchaseList = purchaseRepository.findAllByIdIn(
                 makingOrderList.stream().map(OrderRequest::getPurchaseId).collect(Collectors.toList()));
@@ -69,7 +69,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(readOnly = true)
     @Override
     public List<OrderRequestResDto> getCompletedOrders() {
-        List<OrderRequest> completedOrderList = orderRequestRepository.findAllByOrderStatusAndStoreIdOrderByOrderRequestDttmAsc(OrderStatus.COMPLETED, clientInfoLoader.getStoreId());
+        List<OrderRequest> completedOrderList = orderRequestRepository.findAllByOrderStatusAndStoreIdAndIsDeletedFalseOrderByOrderRequestDttmAsc(OrderStatus.COMPLETED, clientInfoLoader.getStoreId());
 
         List<Purchase> purchaseList = purchaseRepository.findAllByIdIn(
                 completedOrderList.stream().map(OrderRequest::getPurchaseId).collect(Collectors.toList()));
@@ -92,12 +92,16 @@ public class OrderServiceImpl implements OrderService {
             String getOrderStatusBeforeSet = redisRepository.getSetOrderStatus(purchaseId, OrderStatus.MAKING);
             if (OrderStatus.NOT_CONFIRM.getValue().equals(getOrderStatusBeforeSet)) {
                 // '제조중' 변경 성공
-                // 주문요청 저장
-                OrderRequest.builder()
+                // 주문 Making으로 저장
+                OrderRequest orderRequest = OrderRequest.builder()
                         .purchaseId(purchaseId)
                         .orderStatus(OrderStatus.MAKING)
-                        .build()
-                        .linkToStore(storeRepository.findById(clientInfoLoader.getStoreId()).get());
+                        .build();
+                storeRepository.findById(clientInfoLoader.getStoreId()).get()
+                        .linkToOrderRequest(orderRequest);
+                // 기존 주문 완료처리
+                orderRequestRepository.findByPurchaseIdAndOrderStatusAndIsDeletedFalse(OrderStatus.NOT_CONFIRM, purchaseId)
+                        .processDone();
                 // 유저에게 push 알림
                 return true;
             } else {
@@ -114,13 +118,18 @@ public class OrderServiceImpl implements OrderService {
         if (OrderStatus.MAKING.getValue().equals(orderStatus)) {
             // '제조완료' 변경
             redisRepository.setOrderStatus(purchaseId, OrderStatus.COMPLETED);
-            // 주문요청 저장
-            Purchase purchase = purchaseRepository.findById(purchaseId).get();
-            OrderRequest.builder()
+            // 주문 Completed로 저장
+            OrderRequest orderRequest = OrderRequest.builder()
                     .purchaseId(purchaseId)
                     .orderStatus(OrderStatus.COMPLETED)
-                    .build()
-                    .linkToStore(storeRepository.findById(purchase.getStoreId()).get());
+                    .build();
+            storeRepository.findById(clientInfoLoader.getStoreId()).get()
+                    .linkToOrderRequest(orderRequest);
+            // 기존 주문 완료처리
+            orderRequestRepository.findByPurchaseIdAndOrderStatusAndIsDeletedFalse(OrderStatus.MAKING, purchaseId)
+                    .processDone();
+
+            Purchase purchase = purchaseRepository.findById(purchaseId).get();
             // 대기시간 감소
             redisRepository.decreaseWaitingTime(purchase.getStoreId(), purchase.getPurchaseMenuList().size());
             // 유저 등급 경험치 반영
@@ -143,7 +152,10 @@ public class OrderServiceImpl implements OrderService {
         if (OrderStatus.NOT_CONFIRM.getValue().equals(orderStatus)) {
             String getOrderStatusBeforeSet = redisRepository.getSetOrderStatus(purchaseId, OrderStatus.CANCELED);
             if (OrderStatus.NOT_CONFIRM.getValue().equals(getOrderStatusBeforeSet)) {
-                // '결제 취소' 성공
+                // '주문 취소' 성공
+                // 주문 취소처리
+                orderRequestRepository.findByPurchaseIdAndOrderStatusAndIsDeletedFalse(OrderStatus.NOT_CONFIRM, purchaseId)
+                        .orderCancel();
                 // 유저의 환불 이벤트 발행
                 // 매장에 주문 취소 푸시알림
                 // 대기시간 감소

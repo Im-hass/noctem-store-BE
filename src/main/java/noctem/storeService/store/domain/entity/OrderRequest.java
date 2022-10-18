@@ -22,6 +22,8 @@ public class OrderRequest extends BaseEntity {
     private Long purchaseId;
     private OrderStatus orderStatus;
     private LocalDateTime orderRequestDttm;
+    private Boolean isCanceled;
+
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "store_id")
@@ -32,10 +34,23 @@ public class OrderRequest extends BaseEntity {
         this.purchaseId = purchaseId;
         this.orderStatus = orderStatus;
         this.orderRequestDttm = LocalDateTime.now();
+        this.isCanceled = false;
     }
 
     public OrderRequest linkToStore(Store store) {
         this.store = store;
         return this;
     }
+
+    public OrderRequest processDone() {
+        delete();
+        return this;
+    }
+
+    public OrderRequest orderCancel() {
+        this.isCanceled = true;
+        delete();
+        return this;
+    }
+
 }
