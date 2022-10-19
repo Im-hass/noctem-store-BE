@@ -13,7 +13,7 @@ public interface StoreService {
 
     List<SoldOutMenuResDto> getSoldOutMenu(Long storeId);
 
-    Boolean editSoldOutMenu(Long storeId, Long menuId);
+    Boolean editSoldOutMenu(Long menuId);
 
     List<SearchStoreResDto> searchNearbyStore(Double latitude, Double longitude);
 }

@@ -2,7 +2,7 @@ plugins {
     id 'org.springframework.boot' version '2.6.8'
     id 'io.spring.dependency-management' version '1.0.14.RELEASE'
     id 'java'
-//    id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
+//    id 'com.ewerk.gradle.plugins.querydsl' version '1.0.10'
     id 'com.google.cloud.tools.jib' version '3.3.0'
 }
 
@@ -75,7 +75,6 @@ dependencies {
     implementation 'org.springframework.cloud:spring-cloud-starter-bus-kafka'
     implementation 'org.springframework.cloud:spring-cloud-stream-binder-kafka'
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-//    implementation 'com.vladmihalcea:hibernate-types-55:2.19.2'
     implementation 'org.bouncycastle:bcprov-jdk15on:1.70'
     implementation 'io.fusionauth:fusionauth-jwt:5.2.0'
 //    implementation "com.querydsl:querydsl-jpa:5.0.0"

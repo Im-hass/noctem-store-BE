@@ -6,6 +6,7 @@ import noctem.storeService.global.common.CommonResponse;
 import noctem.storeService.store.dto.response.SearchStoreResDto;
 import noctem.storeService.store.dto.response.SoldOutMenuResDto;
 import noctem.storeService.store.service.StoreService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -47,11 +48,11 @@ public class StoreInfoController {
                 .build();
     }
 
-    //    @PreAuthorize("hasRole('STORE')")
-    @PatchMapping("/{storeId}/soldOut/{menuId}")
-    public CommonResponse editSoldOutMenu(@PathVariable Long storeId, @PathVariable Long menuId) {
+    @PreAuthorize("hasRole('STORE')")
+    @PatchMapping("/soldOut/{menuId}")
+    public CommonResponse editSoldOutMenu(@PathVariable Long menuId) {
         return CommonResponse.builder()
-                .data(storeService.editSoldOutMenu(storeId, menuId))
+                .data(storeService.editSoldOutMenu(menuId))
                 .build();
     }
 

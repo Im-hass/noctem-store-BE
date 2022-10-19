@@ -58,7 +58,8 @@ public class StoreServiceImpl implements StoreService {
     }
 
     @Override
-    public Boolean editSoldOutMenu(Long storeId, Long menuId) {
+    public Boolean editSoldOutMenu(Long menuId) {
+        Long storeId = clientInfoLoader.getStoreId();
         Store store = storeRepository.findById(storeId).get();
         // 본인확인
         identificationByStoreId(storeId);

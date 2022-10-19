@@ -8,6 +8,10 @@ import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 
 @Configuration
 public class AppConfig {
+    public static ObjectMapper objectMapper() {
+        return new ObjectMapper();
+    }
+
     @Bean
     public Logger.Level feignLoggerLevel() {
         return Logger.Level.FULL;
@@ -16,9 +20,5 @@ public class AppConfig {
     @Bean
     public Argon2PasswordEncoder passwordEncoder() {
         return new Argon2PasswordEncoder();
-    }
-
-    public static ObjectMapper objectMapper() {
-        return new ObjectMapper();
     }
 }
