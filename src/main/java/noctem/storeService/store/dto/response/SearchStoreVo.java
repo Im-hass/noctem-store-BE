@@ -8,6 +8,7 @@ public interface SearchStoreVo {
     String getMainImg();
 
     String getAddress();
+    String getContactNumber();
 
     String getBusinessOpenHours();
 

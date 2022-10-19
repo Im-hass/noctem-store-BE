@@ -23,6 +23,7 @@ public class SearchStoreResDto {
     private String name;
     private String mainImg;
     private String address;
+    private String contactNumber;
     private String businessOpenHours;
     private String businessCloseHours;
     private Boolean isOpen;
@@ -36,6 +37,7 @@ public class SearchStoreResDto {
         this.name = vo.getName();
         this.mainImg = vo.getMainImg();
         this.address = vo.getAddress();
+        this.contactNumber = vo.getContactNumber();
         this.businessOpenHours = vo.getBusinessOpenHours();
         this.businessCloseHours = vo.getBusinessCloseHours();
         this.isParking = vo.getIsParking();

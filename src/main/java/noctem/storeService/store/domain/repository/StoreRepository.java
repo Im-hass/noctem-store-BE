@@ -12,11 +12,15 @@ import java.util.Optional;
 
 public interface StoreRepository extends JpaRepository<Store, Long> {
     @Query(value = "SELECT s.store_id AS storeId, " +
-            "s.name AS name, s.main_img AS mainImg, " +
-            "s.address AS address, s.way_to_come AS wayToCome, " +
+            "s.name AS name, " +
+            "s.main_img AS mainImg, " +
+            "s.address AS address, " +
+            "s.contact_number AS contactNumber, " +
+            "s.way_to_come AS wayToCome, " +
             "s.business_open_hours AS businessOpenHours, " +
             "s.business_close_Hours AS businessCloseHours, " +
-            "s.is_parking AS isParking, s.is_eco_store AS isEcoStore, " +
+            "s.is_parking AS isParking, " +
+            "s.is_eco_store AS isEcoStore, " +
             "s.is_drive_through AS isDriveThrough, " +
             "(6371000*acos(cos(radians(:latitude))*cos(radians(s.latitude))*cos(radians(s.longitude)-" +
             "radians(:longitude))+sin(radians(:latitude))*sin(radians(s.latitude)))) AS distance " +
