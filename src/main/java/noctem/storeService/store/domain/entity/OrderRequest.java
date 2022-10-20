@@ -20,6 +20,7 @@ public class OrderRequest extends BaseEntity {
     @Column(name = "order_request_id")
     private Long id;
     private Long purchaseId;
+    @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
     private LocalDateTime orderRequestDttm;
     private Boolean isCanceled;

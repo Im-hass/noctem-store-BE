@@ -9,6 +9,7 @@ import noctem.storeService.global.common.BaseEntity;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -105,5 +106,18 @@ public class Store extends BaseEntity {
     public Store delSoldOutMenu(SoldOutMenu soldOutMenu) {
         this.soldOutMenuList.remove(soldOutMenu);
         return this;
+    }
+
+    public Boolean isOpen() {
+        SimpleDateFormat timeForamt = new SimpleDateFormat("HHmm");
+        Integer nowTime = Integer.valueOf(timeForamt.format(System.currentTimeMillis()));
+
+        Integer openHour = Integer.valueOf(businessOpenHours.replaceAll(":", ""));
+        Integer closeHour = Integer.valueOf(businessCloseHours.replaceAll(":", ""));
+
+        if (openHour <= nowTime && nowTime < closeHour) {
+            return true;
+        }
+        return false;
     }
 }

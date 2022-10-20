@@ -45,7 +45,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(readOnly = true)
     @Override
     public List<OrderRequestResDto> getNotConfirmOrders() {
-        List<OrderRequest> notConfirmOrderList = orderRequestRepository.findAllByOrderStatusAndStoreIdAndIsDeletedFalseOrderByOrderRequestDttmAsc(OrderStatus.NOT_CONFIRM, clientInfoLoader.getStoreId());
+        List<OrderRequest> notConfirmOrderList = orderRequestRepository.findAllByOrderStatusAndStoreIdAndIsDeletedFalseAndIsCanceledFalseOrderByOrderRequestDttmAsc(OrderStatus.NOT_CONFIRM, clientInfoLoader.getStoreId());
 
         List<Purchase> purchaseList = purchaseRepository.findAllByIdIn(
                 notConfirmOrderList.stream().map(OrderRequest::getPurchaseId).collect(Collectors.toList()));
@@ -66,7 +66,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(readOnly = true)
     @Override
     public List<OrderRequestResDto> getMakingOrders() {
-        List<OrderRequest> makingOrderList = orderRequestRepository.findAllByOrderStatusAndStoreIdAndIsDeletedFalseOrderByOrderRequestDttmAsc(OrderStatus.MAKING, clientInfoLoader.getStoreId());
+        List<OrderRequest> makingOrderList = orderRequestRepository.findAllByOrderStatusAndStoreIdAndIsDeletedFalseAndIsCanceledFalseOrderByOrderRequestDttmAsc(OrderStatus.MAKING, clientInfoLoader.getStoreId());
         List<Purchase> purchaseList = purchaseRepository.findAllByIdIn(
                 makingOrderList.stream().map(OrderRequest::getPurchaseId).collect(Collectors.toList()));
 
@@ -112,68 +112,84 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Boolean progressToMakingOrderStatus(Long purchaseId) {
         String orderStatus = redisRepository.getOrderStatus(purchaseId);
-        if (OrderStatus.NOT_CONFIRM.getValue().equals(orderStatus) || orderStatus == null) {
-            String getOrderStatusBeforeSet = redisRepository.getSetOrderStatus(purchaseId, OrderStatus.MAKING);
-            try {
-                if (OrderStatus.NOT_CONFIRM.getValue().equals(getOrderStatusBeforeSet)) {
-                    // '제조중' 변경 성공
-                    // 주문 Making으로 저장
-                    OrderRequest orderRequest = OrderRequest.builder()
-                            .purchaseId(purchaseId)
-                            .orderStatus(OrderStatus.MAKING)
-                            .build();
-                    Store store = storeRepository.findById(clientInfoLoader.getStoreId()).get()
-                            .linkToOrderRequest(orderRequest);
-                    orderRequestRepository.save(orderRequest);
-                    // 기존 주문 완료처리
-                    orderRequestRepository.findByOrderStatusAndPurchaseIdAndIsDeletedFalse(OrderStatus.NOT_CONFIRM, purchaseId)
-                            .processDone();
-                    // 유저에게 push 알림
-                    return true;
-                } else {
-                    // '제조중' 변경 실패 (도중에 취소요청이 들어온 경우)
-                    redisRepository.setOrderStatus(purchaseId, OrderStatus.findByValue(getOrderStatusBeforeSet));
-                }
-            } catch (Exception e) {
-                redisRepository.setOrderStatus(purchaseId, OrderStatus.findByValue(getOrderStatusBeforeSet));
-                log.warn("Failed to change Making Status, purchaseId={}", purchaseId);
-            }
+        if (!OrderStatus.NOT_CONFIRM.getValue().equals(orderStatus) && orderStatus != null) {
+            // '제조확인중' 상태가 아닌 경우 실패
+            log.info("Not in NOT_CONFIRM state");
+            return false;
         }
+        String getOrderStatusBeforeSet = redisRepository.getSetOrderStatus(purchaseId, OrderStatus.MAKING);
+        if (!OrderStatus.NOT_CONFIRM.getValue().equals(getOrderStatusBeforeSet) && orderStatus != null) {
+            // '제조중' 변경 실패 (도중에 취소요청이 들어온 경우)
+            log.info("Failed to change to MAKING");
+            redisRepository.setOrderStatus(purchaseId, OrderStatus.findByValue(getOrderStatusBeforeSet));
+            return false;
+        }
+        try {
+            if (orderRequestRepository.findByOrderStatusAndPurchaseId(OrderStatus.MAKING, purchaseId) != null) {
+                throw CommonException.builder().build();
+            }
+            // '제조중' 변경 성공
+            // 주문 MAKING으로 저장
+            OrderRequest orderRequest = OrderRequest.builder()
+                    .purchaseId(purchaseId)
+                    .orderStatus(OrderStatus.MAKING)
+                    .build();
+            Store store = storeRepository.findById(clientInfoLoader.getStoreId()).get()
+                    .linkToOrderRequest(orderRequest);
+            orderRequestRepository.save(orderRequest);
+            // 기존 주문 완료처리
+            orderRequestRepository.findByOrderStatusAndPurchaseId(OrderStatus.NOT_CONFIRM, purchaseId)
+                    .processDone();
+            // 유저에게 push 알림
+            return true;
+        } catch (NullPointerException e) {
+            log.warn("Failed to change MAKING Status, purchaseId={}", purchaseId);
+        } catch (CommonException e) {
+            log.warn("Failed to change MAKING Status, because the data already exists, purchaseId={}", purchaseId);
+        }
+        redisRepository.setOrderStatus(purchaseId, OrderStatus.findByValue(getOrderStatusBeforeSet));
         return false;
     }
 
     @Override
     public Boolean progressToCompletedOrderStatus(Long purchaseId) {
         String orderStatus = redisRepository.getOrderStatus(purchaseId);
-        try {
-            if (OrderStatus.MAKING.getValue().equals(orderStatus)) {
-                // '제조완료' 변경
-                redisRepository.setOrderStatus(purchaseId, OrderStatus.COMPLETED);
-                // 주문 Completed로 저장
-                OrderRequest orderRequest = OrderRequest.builder()
-                        .purchaseId(purchaseId)
-                        .orderStatus(OrderStatus.COMPLETED)
-                        .build();
-                storeRepository.findById(clientInfoLoader.getStoreId()).get()
-                        .linkToOrderRequest(orderRequest);
-                orderRequestRepository.save(orderRequest);
-                // 기존 주문 완료처리
-                orderRequestRepository.findByOrderStatusAndPurchaseIdAndIsDeletedFalse(OrderStatus.MAKING, purchaseId)
-                        .processDone();
-
-                Purchase purchase = purchaseRepository.findById(purchaseId).get();
-                // 유저 등급 경험치 반영
-                increaseUserExp(purchase.getUserAccountId(), purchase.getPurchaseTotalPrice());
-                // 대기시간 감소
-                redisRepository.decreaseWaitingTime(purchase.getStoreId(), purchase.getPurchaseMenuList().size());
-                // 유저에게 push 알림
-                return true;
-            }
-        } catch (Exception e) {
-            redisRepository.setOrderStatus(purchaseId, OrderStatus.findByValue(orderStatus));
-            log.warn("Failed to change Completed Status, purchaseId={}", purchaseId);
+        if (!OrderStatus.MAKING.getValue().equals(orderStatus)) {
+            // '제조중' 상태가 아닌 경우 실패
+            log.info("Not in MAKING state");
+            return false;
         }
-        // '제조중' 상태가 아닌 경우 실패
+        try {
+            if (orderRequestRepository.findByOrderStatusAndPurchaseId(OrderStatus.COMPLETED, purchaseId) != null) {
+                throw CommonException.builder().build();
+            }
+            // 주문 COMPLETED로 저장
+            OrderRequest orderRequest = OrderRequest.builder()
+                    .purchaseId(purchaseId)
+                    .orderStatus(OrderStatus.COMPLETED)
+                    .build();
+            storeRepository.findById(clientInfoLoader.getStoreId()).get()
+                    .linkToOrderRequest(orderRequest);
+            orderRequestRepository.save(orderRequest);
+            // 기존 주문 완료처리
+            orderRequestRepository.findByOrderStatusAndPurchaseId(OrderStatus.MAKING, purchaseId)
+                    .processDone();
+
+            Purchase purchase = purchaseRepository.findById(purchaseId).get();
+            // 유저 등급 경험치 반영
+            increaseUserExp(purchase.getUserAccountId(), purchase.getPurchaseTotalPrice());
+            // 대기시간 감소
+            redisRepository.decreaseWaitingTime(purchase.getStoreId(), purchase.getPurchaseMenuList().size());
+            // '제조완료' 변경
+            redisRepository.setOrderStatus(purchaseId, OrderStatus.COMPLETED);
+            // 유저에게 push 알림
+            return true;
+        } catch (NullPointerException e) {
+            log.warn("Failed to change COMPLETED Status, purchaseId={}", purchaseId);
+        } catch (CommonException e) {
+            log.warn("Failed to change COMPLETED Status, because the data already exists, purchaseId={}", purchaseId);
+        }
+        redisRepository.setOrderStatus(purchaseId, OrderStatus.MAKING);
         return false;
     }
 
@@ -184,25 +200,28 @@ public class OrderServiceImpl implements OrderService {
         if (!Objects.equals(purchase.getUserAccountId(), clientInfoLoader.getUserAccountId())) {
             throw CommonException.builder().errorCode(5004).httpStatus(HttpStatus.UNAUTHORIZED).build();
         }
+        // OrderStatus 확인
         String orderStatus = redisRepository.getOrderStatus(purchaseId);
-        if (OrderStatus.NOT_CONFIRM.getValue().equals(orderStatus)) {
-            String getOrderStatusBeforeSet = redisRepository.getSetOrderStatus(purchaseId, OrderStatus.CANCELED);
-            if (OrderStatus.NOT_CONFIRM.getValue().equals(getOrderStatusBeforeSet)) {
-                // '주문 취소' 성공
-                // 주문 취소처리
-                orderRequestRepository.findByOrderStatusAndPurchaseIdAndIsDeletedFalse(OrderStatus.NOT_CONFIRM, purchaseId)
-                        .orderCancel();
-                // 유저의 환불 이벤트 발행
-                // 매장에 주문 취소 푸시알림
-                // 대기시간 감소
-                redisRepository.decreaseWaitingTime(purchase.getStoreId(), purchase.getPurchaseMenuList().size());
-                return true;
-            } else {
-                // '결제 취소' 실패
-                redisRepository.setOrderStatus(purchaseId, OrderStatus.findByValue(getOrderStatusBeforeSet));
-            }
+        if (!OrderStatus.NOT_CONFIRM.getValue().equals(orderStatus) && orderStatus != null) {
+            log.info("Not in NOT_CONFIRM state");
+            return false;
         }
-        return false;
+        String getOrderStatusBeforeSet = redisRepository.getSetOrderStatus(purchaseId, OrderStatus.CANCELED);
+        if (!OrderStatus.NOT_CONFIRM.getValue().equals(getOrderStatusBeforeSet) && orderStatus != null) {
+            // 도중에 상태가 변경되어 '결제 취소' 실패
+            log.info("Failed to change to CANCELED");
+            redisRepository.setOrderStatus(purchaseId, OrderStatus.findByValue(getOrderStatusBeforeSet));
+            return false;
+        }
+        // '주문 취소' 성공
+        // 주문 취소처리
+        orderRequestRepository.findByOrderStatusAndPurchaseId(OrderStatus.NOT_CONFIRM, purchaseId)
+                .orderCancel();
+        // 유저의 환불 이벤트 발행
+        // 매장에 주문 취소 푸시알림
+        // 대기시간 감소
+        redisRepository.decreaseWaitingTime(purchase.getStoreId(), purchase.getPurchaseMenuList().size());
+        return true;
     }
 
     @Transactional(readOnly = true)
@@ -226,7 +245,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public void orderBatchProcessing() {
         try {
-            List<OrderRequest> orderList = orderRequestRepository.findAllByOrderStatusAndStoreIdAndIsDeletedFalseOrderByOrderRequestDttmAsc(OrderStatus.NOT_CONFIRM, clientInfoLoader.getStoreId());
+            List<OrderRequest> orderList = orderRequestRepository.findAllByOrderStatusAndStoreIdAndIsDeletedFalseAndIsCanceledFalseOrderByOrderRequestDttmAsc(OrderStatus.NOT_CONFIRM, clientInfoLoader.getStoreId());
             orderList.forEach(e -> {
                 progressToMakingOrderStatus(e.getPurchaseId());
                 progressToCompletedOrderStatus(e.getPurchaseId());

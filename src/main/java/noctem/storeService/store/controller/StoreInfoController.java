@@ -3,10 +3,12 @@ package noctem.storeService.store.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import noctem.storeService.global.common.CommonResponse;
+import noctem.storeService.store.dto.request.SearchStoreFilterReqDto;
 import noctem.storeService.store.dto.response.SearchStoreResDto;
 import noctem.storeService.store.dto.response.SoldOutMenuResDto;
 import noctem.storeService.store.service.StoreService;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -57,11 +59,21 @@ public class StoreInfoController {
     }
 
     @GetMapping("/search/{latitude}/{longitude}")
-    public CommonResponse searchNearbyStore(@PathVariable Double latitude, @PathVariable Double longitude) {
-        List<SearchStoreResDto> dtoList = storeService.searchNearbyStore(latitude, longitude);
+    public CommonResponse searchNearbyStore(@PathVariable Double latitude,
+                                            @PathVariable Double longitude,
+                                            @Validated SearchStoreFilterReqDto filterReqDto) {
+        List<SearchStoreResDto> dtoList = storeService.searchNearbyStore(latitude, longitude, filterReqDto.setDefault());
         dtoList.forEach(e -> e.setIndex(dtoList.indexOf(e)));
         return CommonResponse.builder()
                 .data(dtoList)
                 .build();
     }
+
+    // 아직 미구현
+//    @GetMapping("/search/{keyword}")
+//    public CommonResponse searchStoreByKeyword(@PathVariable String keyword) {
+//        return CommonResponse.builder()
+//                .data(true)
+//                .build();
+//    }
 }

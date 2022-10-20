@@ -1,5 +1,6 @@
 package noctem.storeService.store.service;
 
+import noctem.storeService.store.dto.request.SearchStoreFilterReqDto;
 import noctem.storeService.store.dto.response.*;
 
 import java.util.List;
@@ -15,5 +16,5 @@ public interface StoreService {
 
     Boolean editSoldOutMenu(Long menuId);
 
-    List<SearchStoreResDto> searchNearbyStore(Double latitude, Double longitude);
+    List<SearchStoreResDto> searchNearbyStore(Double latitude, Double longitude, SearchStoreFilterReqDto filterReqDto);
 }

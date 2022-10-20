@@ -4,8 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import noctem.storeService.store.domain.entity.Store;
 
-import java.text.SimpleDateFormat;
-
 @Data
 @AllArgsConstructor
 public class MyStoreInfoResDto {
@@ -32,23 +30,10 @@ public class MyStoreInfoResDto {
         this.wayToCome = store.getWayToCome();
         this.businessOpenHours = store.getBusinessOpenHours();
         this.businessCloseHours = store.getBusinessCloseHours();
-        this.isOpen = isStoreOpen(this.businessOpenHours, this.businessCloseHours);
+        this.isOpen = store.isOpen();
         this.isParking = store.getIsParking();
         this.isEcoStore = store.getIsEcoStore();
         this.isDriveThrough = store.getIsDriveThrough();
         this.contactNumber = store.getContactNumber();
-    }
-
-    private Boolean isStoreOpen(String businessOpenHours, String businessCloseHours) {
-        SimpleDateFormat timeForamt = new SimpleDateFormat("HHmm");
-        Integer nowTime = Integer.valueOf(timeForamt.format(System.currentTimeMillis()));
-
-        Integer openHour = Integer.valueOf(businessOpenHours.replaceAll(":", ""));
-        Integer closeHour = Integer.valueOf(businessCloseHours.replaceAll(":", ""));
-
-        if (openHour <= nowTime && nowTime < closeHour) {
-            return true;
-        }
-        return false;
     }
 }

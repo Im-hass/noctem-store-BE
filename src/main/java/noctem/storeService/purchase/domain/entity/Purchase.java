@@ -47,6 +47,7 @@ public class Purchase extends BaseEntity {
     private String anonymousName;
     private String anonymousPhoneNumber;
     private Integer age;
+    @Enumerated(EnumType.STRING)
     private Sex sex;
     private Integer purchaseTotalPrice;
     private Long giftId;
