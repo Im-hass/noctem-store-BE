@@ -23,6 +23,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -49,35 +50,57 @@ public class OrderServiceImpl implements OrderService {
         List<Purchase> purchaseList = purchaseRepository.findAllByIdIn(
                 notConfirmOrderList.stream().map(OrderRequest::getPurchaseId).collect(Collectors.toList()));
 
-        Map<Long, String> orderRequestTimeMap = notConfirmOrderList.stream().collect(Collectors.toMap(OrderRequest::getPurchaseId, e -> redisRepository.getOrderRequestTime(e.getPurchaseId())));
+        Map<Long, String> orderRequestTimeMap = new HashMap<>();
 
-        return purchaseList.stream().map(e -> new OrderRequestResDto(e, orderRequestTimeMap.get(e.getId()))).collect(Collectors.toList());
+        notConfirmOrderList.forEach(e -> {
+            String orderRequestTime = redisRepository.getOrderRequestTime(e.getPurchaseId());
+            if (orderRequestTime != null) {
+                orderRequestTimeMap.put(e.getPurchaseId(), orderRequestTime);
+            }
+        });
+
+        return purchaseList.stream().map(e -> new OrderRequestResDto(e, orderRequestTimeMap.get(e.getId())))
+                .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
     @Override
     public List<OrderRequestResDto> getMakingOrders() {
         List<OrderRequest> makingOrderList = orderRequestRepository.findAllByOrderStatusAndStoreIdAndIsDeletedFalseOrderByOrderRequestDttmAsc(OrderStatus.MAKING, clientInfoLoader.getStoreId());
-
         List<Purchase> purchaseList = purchaseRepository.findAllByIdIn(
                 makingOrderList.stream().map(OrderRequest::getPurchaseId).collect(Collectors.toList()));
 
-        Map<Long, String> orderRequestTimeMap = makingOrderList.stream().collect(Collectors.toMap(OrderRequest::getPurchaseId, e -> redisRepository.getOrderRequestTime(e.getPurchaseId())));
+        Map<Long, String> orderRequestTimeMap = new HashMap<>();
 
-        return purchaseList.stream().map(e -> new OrderRequestResDto(e, orderRequestTimeMap.get(e.getId()))).collect(Collectors.toList());
+        makingOrderList.forEach(e -> {
+            String orderRequestTime = redisRepository.getOrderRequestTime(e.getPurchaseId());
+            if (orderRequestTime != null) {
+                orderRequestTimeMap.put(e.getPurchaseId(), orderRequestTime);
+            }
+        });
+
+        return purchaseList.stream().map(e -> new OrderRequestResDto(e, orderRequestTimeMap.get(e.getId())))
+                .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
     @Override
     public List<OrderRequestResDto> getCompletedOrders() {
-        List<OrderRequest> completedOrderList = orderRequestRepository.findAllByOrderStatusAndStoreIdAndIsDeletedFalseOrderByOrderRequestDttmAsc(OrderStatus.COMPLETED, clientInfoLoader.getStoreId());
-
+        List<OrderRequest> completedOrderList = orderRequestRepository.findTop5ByOrderStatusAndStoreIdAndIsDeletedFalseOrderByOrderRequestDttmDesc(OrderStatus.COMPLETED, clientInfoLoader.getStoreId());
         List<Purchase> purchaseList = purchaseRepository.findAllByIdIn(
                 completedOrderList.stream().map(OrderRequest::getPurchaseId).collect(Collectors.toList()));
 
-        Map<Long, String> orderRequestTimeMap = completedOrderList.stream().collect(Collectors.toMap(OrderRequest::getPurchaseId, e -> redisRepository.getOrderRequestTime(e.getPurchaseId())));
+        Map<Long, String> orderRequestTimeMap = new HashMap<>();
 
-        return purchaseList.stream().map(e -> new OrderRequestResDto(e, orderRequestTimeMap.get(e.getId()))).collect(Collectors.toList());
+        completedOrderList.forEach(e -> {
+            String orderRequestTime = redisRepository.getOrderRequestTime(e.getPurchaseId());
+            if (orderRequestTime != null) {
+                orderRequestTimeMap.put(e.getPurchaseId(), orderRequestTime);
+            }
+        });
+
+        return purchaseList.stream().map(e -> new OrderRequestResDto(e, orderRequestTimeMap.get(e.getId())))
+                .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
@@ -197,5 +220,20 @@ public class OrderServiceImpl implements OrderService {
         } catch (JsonProcessingException e) {
             log.warn("Occurred JsonProcessingException. [{}]", OrderServiceImpl.class.getSimpleName());
         }
+    }
+
+    // == dev 코드 ==
+    @Override
+    public void orderBatchProcessing() {
+        try {
+            List<OrderRequest> orderList = orderRequestRepository.findAllByOrderStatusAndStoreIdAndIsDeletedFalseOrderByOrderRequestDttmAsc(OrderStatus.NOT_CONFIRM, clientInfoLoader.getStoreId());
+            orderList.forEach(e -> {
+                progressToMakingOrderStatus(e.getPurchaseId());
+                progressToCompletedOrderStatus(e.getPurchaseId());
+            });
+        } catch (Exception e) {
+            log.warn("Occurred exception from orderBatchProcessing");
+        }
+
     }
 }

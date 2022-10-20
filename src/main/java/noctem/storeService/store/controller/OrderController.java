@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import noctem.storeService.global.common.CommonResponse;
 import noctem.storeService.store.dto.response.OrderRequestResDto;
 import noctem.storeService.store.service.OrderService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -86,6 +87,16 @@ public class OrderController {
     public CommonResponse waitingTime(@PathVariable Long storeId) {
         return CommonResponse.builder()
                 .data(orderService.getWaitingTime(storeId))
+                .build();
+    }
+
+    // == dev 코드 ==
+    @PreAuthorize("hasRole('STORE')")
+    @PatchMapping("/batchProccess")
+    public CommonResponse batchProccess() {
+        orderService.orderBatchProcessing();
+        return CommonResponse.builder()
+                .data(true)
                 .build();
     }
 }
