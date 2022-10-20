@@ -9,18 +9,18 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class SearchStoreFilterReqDto {
-    private Boolean isOpen;
-    private Boolean isParking;
-    private Boolean isEcoStore;
-    private Boolean isDriveThrough;
+    private Boolean open;
+    private Boolean parking;
+    private Boolean ecoStore;
+    private Boolean driveThrough;
     private Integer offset;
 
     public SearchStoreFilterReqDto setDefault() {
         this.offset = offset == null ? 0 : offset;
-        this.isOpen = isOpen == null ? false : isOpen;
-        this.isParking = isParking == null ? false : isParking;
-        this.isEcoStore = isEcoStore == null ? false : isEcoStore;
-        this.isDriveThrough = isDriveThrough == null ? false : isDriveThrough;
+        this.open = open == null ? false : open;
+        this.parking = parking == null ? false : parking;
+        this.ecoStore = ecoStore == null ? false : ecoStore;
+        this.driveThrough = driveThrough == null ? false : driveThrough;
         return this;
     }
 }

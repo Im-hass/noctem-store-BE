@@ -24,7 +24,8 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
             "s.is_drive_through AS isDriveThrough, " +
             "(6371000*acos(cos(radians(:latitude))*cos(radians(s.latitude))*cos(radians(s.longitude)-" +
             "radians(:longitude))+sin(radians(:latitude))*sin(radians(s.latitude)))) AS distance " +
-            "FROM store AS s ORDER BY distance " +
+            "FROM store AS s " +
+            "ORDER BY distance " +
             "LIMIT 10 OFFSET :offset", nativeQuery = true)
     List<SearchStoreVo> findDtoByNativeProjections(@Param("latitude") Double latitude,
                                                    @Param("longitude") Double longitude,

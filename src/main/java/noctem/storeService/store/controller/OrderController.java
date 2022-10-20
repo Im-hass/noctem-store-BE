@@ -17,7 +17,7 @@ import java.util.List;
 public class OrderController {
     private final OrderService orderService;
 
-    // 매장의 '주문확인중' 목록 조회
+    // 자기 매장의 '주문확인중' 목록 조회
     @GetMapping("/notConfirm")
     public CommonResponse getNotConfirmOrders() {
         List<OrderRequestResDto> dtoList = orderService.getNotConfirmOrders();
@@ -27,7 +27,7 @@ public class OrderController {
                 .build();
     }
 
-    // 매장의 '제조중' 목록 조회
+    // 자기 매장의 '제조중' 목록 조회
     @GetMapping("/making")
     public CommonResponse getMakingOrders() {
         List<OrderRequestResDto> dtoList = orderService.getMakingOrders();
@@ -37,7 +37,7 @@ public class OrderController {
                 .build();
     }
 
-    // 매장의 '제조완료' 목록 조회 (5개)
+    // 자기 매장의 '제조완료' 목록 조회 (5개)
     @GetMapping("/completed")
     public CommonResponse getCompletedOrders() {
         List<OrderRequestResDto> dtoList = orderService.getCompletedOrders();
@@ -56,7 +56,7 @@ public class OrderController {
     }
 
     // 주문상태 '주문확인중' -> '제조중'으로 변경
-    // @PreAuthorize("hasRole('STORE')")
+    @PreAuthorize("hasRole('STORE')")
     @PatchMapping("/{purchaseId}/making")
     public CommonResponse progressToMakingOrderStatus(@PathVariable Long purchaseId) {
         return CommonResponse.builder()
@@ -65,7 +65,7 @@ public class OrderController {
     }
 
     // 주문상태 '제조중' -> '제조완료'로 변경
-    // @PreAuthorize("hasRole('STORE')")
+    @PreAuthorize("hasRole('STORE')")
     @PatchMapping("/{purchaseId}/completed")
     public CommonResponse progressToCompletedOrderStatus(@PathVariable Long purchaseId) {
         return CommonResponse.builder()
@@ -74,11 +74,20 @@ public class OrderController {
     }
 
     // 유저의 주문 취소요청. '주문확인중' 상태일 때만 가능. 본인 확인 필.
-    // @PreAuthorize("hasRole('USER')")
-    @PatchMapping("/{purchaseId}/cancel")
-    public CommonResponse cancelOrder(@PathVariable Long purchaseId) {
+    @PreAuthorize("hasRole('USER')")
+    @PatchMapping("/user/{purchaseId}/cancel")
+    public CommonResponse cancelOrderByUser(@PathVariable Long purchaseId) {
         return CommonResponse.builder()
                 .data(orderService.cancelOrderByUser(purchaseId))
+                .build();
+    }
+
+    // 매장의 주문 반려. '주문확인중' 상태일 때만 가능. 본인 확인 필.
+    @PreAuthorize("hasRole('STORE')")
+    @PatchMapping("/store/{purchaseId}/cancel")
+    public CommonResponse cancelOrderByStore(@PathVariable Long purchaseId) {
+        return CommonResponse.builder()
+                .data(orderService.cancelOrderByStore(purchaseId))
                 .build();
     }
 

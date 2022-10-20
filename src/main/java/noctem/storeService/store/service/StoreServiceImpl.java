@@ -8,7 +8,6 @@ import noctem.storeService.store.domain.entity.SoldOutMenu;
 import noctem.storeService.store.domain.entity.Store;
 import noctem.storeService.store.domain.repository.SoldOutMenuRepository;
 import noctem.storeService.store.domain.repository.StoreRepository;
-import noctem.storeService.store.dto.request.SearchStoreFilterReqDto;
 import noctem.storeService.store.dto.response.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -78,9 +77,9 @@ public class StoreServiceImpl implements StoreService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<SearchStoreResDto> searchNearbyStore(Double latitude, Double longitude, SearchStoreFilterReqDto filterReqDto) {
-        return storeRepository.findDtoByNativeProjections(latitude, longitude, filterReqDto.getOffset())
-                .stream().map(e -> new SearchStoreResDto(e)).collect(Collectors.toList());
+    public List<SearchStoreResDto> searchNearbyStore(Double latitude, Double longitude, Integer page) {
+        return storeRepository.findDtoByNativeProjections(latitude, longitude, (page - 1) * 10)
+                .stream().map(SearchStoreResDto::new).collect(Collectors.toList());
     }
 
     private void identificationByStoreId(Long storeId) {

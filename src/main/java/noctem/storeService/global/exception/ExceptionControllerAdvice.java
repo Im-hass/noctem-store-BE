@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 /***
  * errorCode: 5000 ~ 5999
- * 사용가능 : 5005 ~
+ * 사용가능 : 5006 ~
  */
 
 @Slf4j
