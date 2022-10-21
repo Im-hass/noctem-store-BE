@@ -77,8 +77,8 @@ public class StoreServiceImpl implements StoreService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<SearchStoreResDto> searchNearbyStore(Double latitude, Double longitude, Integer page) {
-        return storeRepository.findDtoByNativeProjections(latitude, longitude, (page - 1) * 10)
+    public List<SearchStoreResDto> searchNearbyStore(Double latitude, Double longitude) {
+        return storeRepository.findDtoByNativeProjections(latitude, longitude)
                 .stream().map(SearchStoreResDto::new).collect(Collectors.toList());
     }
 

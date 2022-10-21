@@ -15,5 +15,5 @@ public interface StoreService {
 
     Boolean editSoldOutMenu(Long menuId);
 
-    List<SearchStoreResDto> searchNearbyStore(Double latitude, Double longitude, Integer page);
+    List<SearchStoreResDto> searchNearbyStore(Double latitude, Double longitude);
 }

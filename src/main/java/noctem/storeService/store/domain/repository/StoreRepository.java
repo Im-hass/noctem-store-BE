@@ -26,10 +26,9 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
             "radians(:longitude))+sin(radians(:latitude))*sin(radians(s.latitude)))) AS distance " +
             "FROM store AS s " +
             "ORDER BY distance " +
-            "LIMIT 10 OFFSET :offset", nativeQuery = true)
+            "LIMIT 10", nativeQuery = true)
     List<SearchStoreVo> findDtoByNativeProjections(@Param("latitude") Double latitude,
-                                                   @Param("longitude") Double longitude,
-                                                   @Param("offset") Integer offset);
+                                                   @Param("longitude") Double longitude);
 
     @Override
     @EntityGraph(attributePaths = {"storeAccount", "orderRequestList"})

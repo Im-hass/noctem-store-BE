@@ -58,9 +58,8 @@ public class StoreInfoController {
 
     @GetMapping("/search/{latitude}/{longitude}")
     public CommonResponse searchNearbyStore(@PathVariable Double latitude,
-                                            @PathVariable Double longitude,
-                                            @RequestParam Integer page) {
-        List<SearchStoreResDto> dtoList = storeService.searchNearbyStore(latitude, longitude, page);
+                                            @PathVariable Double longitude) {
+        List<SearchStoreResDto> dtoList = storeService.searchNearbyStore(latitude, longitude);
         dtoList.forEach(e -> e.setIndex(dtoList.indexOf(e)));
         return CommonResponse.builder()
                 .data(dtoList)
