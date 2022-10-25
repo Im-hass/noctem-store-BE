@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional(propagation = Propagation.REQUIRES_NEW)
 @RequiredArgsConstructor
-public class FromPurchaseKafkaConsumer {
+public class KafkaConsumer {
     private final String PURCHASE_TO_STORE_TOPIC = "purchase-to-store";
     private final RedisRepository redisRepository;
     private final PurchaseRepository purchaseRepository;

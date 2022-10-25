@@ -213,7 +213,7 @@ public class OrderServiceImpl implements OrderService {
         // 주문 취소처리
         orderRequestRepository.findByOrderStatusAndPurchaseId(OrderStatus.NOT_CONFIRM, purchaseId)
                 .orderCancel();
-        // 유저의 환불 이벤트 발행
+        // 유저의 환불 이벤트 발행 -> 생략
         // 매장에 주문 취소 푸시알림
         // 대기시간 감소
         redisRepository.decreaseWaitingTime(purchase.getStoreId(), purchase.getPurchaseMenuList().size());

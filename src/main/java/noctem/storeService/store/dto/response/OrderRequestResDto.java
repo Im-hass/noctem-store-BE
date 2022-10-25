@@ -21,7 +21,8 @@ public class OrderRequestResDto {
 
     public OrderRequestResDto(Purchase purchase, String orderRequestTime) {
         this.purchaseId = purchase.getId();
-        this.orderTotalQty = purchase.getPurchaseMenuList().size();
+        this.orderTotalQty = 0;
+        purchase.getPurchaseMenuList().forEach(e -> orderTotalQty += e.getQty());
         this.menuList = purchase.getPurchaseMenuList().stream().map(InnerDto.MenuResDto::new).collect(Collectors.toList());
         menuList.forEach(e -> e.setIndex(menuList.indexOf(e)));
         this.userNickname = purchase.getUserNickname();
