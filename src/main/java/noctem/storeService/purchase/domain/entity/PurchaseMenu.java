@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import noctem.storeService.global.common.BaseEntity;
+import noctem.storeService.global.enumeration.CupType;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -27,6 +28,8 @@ public class PurchaseMenu extends BaseEntity {
     private String menuShortName;
     private String temperature;
     private String size;
+    @Enumerated(EnumType.STRING)
+    private CupType cupType;
     private Integer qty;
     private Integer menuTotalPrice;
     @JsonIgnore
@@ -39,10 +42,11 @@ public class PurchaseMenu extends BaseEntity {
     private Purchase purchase;
 
     @Builder
-    public PurchaseMenu(Long sizeId, String menuFullName, String menuShortName, String temperature, String size, Integer qty, Integer menuTotalPrice) {
+    public PurchaseMenu(Long sizeId, String menuFullName, String menuShortName, CupType cupType, Integer qty, Integer menuTotalPrice) {
         this.sizeId = sizeId;
         this.menuFullName = menuFullName;
         this.menuShortName = menuShortName;
+        this.cupType = cupType;
         this.qty = qty;
         this.menuTotalPrice = menuTotalPrice;
         this.temperature = extractTemperature(menuShortName);

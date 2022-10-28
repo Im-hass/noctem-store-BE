@@ -8,9 +8,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public enum Amount {
-    STORE_CUP("매장컵"),
-    PERSONAL_CUP("개인컵"),
-    DISPOSABLE_CUP("일회용컵"),
     WITHOUT("없이"),
     LESS("적게"),
     DEFAULT("보통"),

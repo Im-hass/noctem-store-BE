@@ -15,6 +15,7 @@ public class InnerDto {
     public static class MenuResDto {
         private Integer index;
         private Long sizeId;
+        private String cupType;
         private String menuName; // temp테이블의 name
         // private String menuImg; // sizeId를 이용해서 메뉴서비스에 api보내기
         private Integer qty;
@@ -22,6 +23,7 @@ public class InnerDto {
 
         public MenuResDto(PurchaseMenu purchaseMenu) {
             this.sizeId = purchaseMenu.getSizeId();
+            this.cupType = purchaseMenu.getCupType().getValue();
             this.menuName = purchaseMenu.getMenuFullName();
             this.qty = purchaseMenu.getQty();
             this.optionList = new ArrayList<>();
