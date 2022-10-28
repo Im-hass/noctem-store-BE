@@ -18,6 +18,9 @@ import noctem.storeService.store.dto.response.IncreaseUserExpKafkaDto;
 import noctem.storeService.store.dto.response.OrderRequestResDto;
 import noctem.storeService.store.dto.response.OrderStatusResDto;
 import noctem.storeService.store.dto.response.WaitingTimeResDto;
+import noctem.storeService.store.dto.vo.OrderCancelFromStoreVo;
+import noctem.storeService.store.dto.vo.OrderCancelFromUserVo;
+import noctem.storeService.store.dto.vo.OrderStatusChangeFromStoreVo;
 import org.springframework.http.HttpStatus;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -26,6 +29,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/***
+ * PURCHASE_FROM_USER_TOPIC : 유저결제 -> 매장에게 알림
+ * ORDER_STATUS_CHANGE_FROM_STORE_TOPIC : 매장에서 주문상태 변경 -> 유저에게 알림
+ * ORDER_CANCEL_FROM_USER_TOPIC : 유저가 주문 취소 -> 매장에게 알림
+ * ORDER_CANCEL_FROM_STORE_TOPIC : 매장에서 주문 반려 -> 유저에게 알림
+ * STORE_TO_USER_GRADE_EXP_TOPIC : 제조완료 -> 유저 경험치 반영
+ */
 @Slf4j
 @Service
 @Transactional
@@ -36,6 +46,10 @@ public class OrderServiceImpl implements OrderService {
     private final PurchaseRepository purchaseRepository;
     private final OrderRequestRepository orderRequestRepository;
     private final StoreRepository storeRepository;
+    private final String PURCHASE_FROM_USER_TOPIC = "purchase-from-user-alert";
+    private final String ORDER_CANCEL_FROM_USER_TOPIC = "order-cancel-from-user-alert";
+    private final String ORDER_STATUS_CHANGE_FROM_STORE_TOPIC = "order-status-change-from-store-alert";
+    private final String ORDER_CANCEL_FROM_STORE_TOPIC = "order-cancel-from-store-alert";
     private final String STORE_TO_USER_GRADE_EXP_TOPIC = "store-to-user-grade-exp";
     private final KafkaTemplate<String, String> stringKafkaTemplate;
 
@@ -127,7 +141,7 @@ public class OrderServiceImpl implements OrderService {
             }
             // '제조중' 변경 성공
             // 매장 본인 확인
-            storeIdentificationByPurchaseId(purchaseId);
+            Purchase purchase = storeIdentificationByPurchaseId(purchaseId);
             // 주문 MAKING으로 저장
             OrderRequest orderRequest = OrderRequest.builder()
                     .purchaseId(purchaseId)
@@ -140,11 +154,15 @@ public class OrderServiceImpl implements OrderService {
             orderRequestRepository.findByOrderStatusAndPurchaseId(OrderStatus.NOT_CONFIRM, purchaseId)
                     .processDone();
             // 유저에게 push 알림
+            OrderStatusChangeFromStoreVo alertVo = new OrderStatusChangeFromStoreVo(purchase.getUserAccountId(), purchaseId, purchase.getStoreOrderNumber(), OrderStatus.MAKING.getValue());
+            stringKafkaTemplate.send(ORDER_STATUS_CHANGE_FROM_STORE_TOPIC, AppConfig.objectMapper().writeValueAsString(alertVo));
             return true;
         } catch (NullPointerException e) {
             log.warn("Failed to change MAKING Status, purchaseId={}", purchaseId);
         } catch (CommonException e) {
             log.warn("Failed to change MAKING Status, because the data already exists, purchaseId={}", purchaseId);
+        } catch (JsonProcessingException e) {
+            log.warn("Failed to change MAKING Status, because occurred JsonProcessingException, purchaseId={}", purchaseId);
         }
         redisRepository.setOrderStatus(purchaseId, OrderStatus.findByValue(getOrderStatusBeforeSet));
         return false;
@@ -182,11 +200,15 @@ public class OrderServiceImpl implements OrderService {
             // '제조완료' 변경
             redisRepository.setOrderStatus(purchaseId, OrderStatus.COMPLETED);
             // 유저에게 push 알림
+            OrderStatusChangeFromStoreVo alertVo = new OrderStatusChangeFromStoreVo(purchase.getUserAccountId(), purchaseId, purchase.getStoreOrderNumber(), OrderStatus.COMPLETED.getValue());
+            stringKafkaTemplate.send(ORDER_STATUS_CHANGE_FROM_STORE_TOPIC, AppConfig.objectMapper().writeValueAsString(alertVo));
             return true;
         } catch (NullPointerException e) {
             log.warn("Failed to change COMPLETED Status, purchaseId={}", purchaseId);
         } catch (CommonException e) {
             log.warn("Failed to change COMPLETED Status, because the data already exists, purchaseId={}", purchaseId);
+        } catch (JsonProcessingException e) {
+            log.warn("Failed to change COMPLETED Status, because occurred JsonProcessingException, purchaseId={}", purchaseId);
         }
         redisRepository.setOrderStatus(purchaseId, OrderStatus.MAKING);
         return false;
@@ -213,10 +235,16 @@ public class OrderServiceImpl implements OrderService {
         // 주문 취소처리
         orderRequestRepository.findByOrderStatusAndPurchaseId(OrderStatus.NOT_CONFIRM, purchaseId)
                 .orderCancel();
-        // 유저의 환불 이벤트 발행 -> 생략
-        // 매장에 주문 취소 푸시알림
         // 대기시간 감소
         redisRepository.decreaseWaitingTime(purchase.getStoreId(), purchase.getPurchaseMenuList().size());
+        // 매장에 주문 취소 푸시알림
+        try {
+            OrderCancelFromUserVo alertVo = new OrderCancelFromUserVo(purchase.getStoreId(), purchase.getStoreOrderNumber(), purchase.getUserAccountId());
+            stringKafkaTemplate.send(ORDER_CANCEL_FROM_USER_TOPIC, AppConfig.objectMapper().writeValueAsString(alertVo));
+        } catch (JsonProcessingException e) {
+            log.warn("Occurred JsonProcessingException in cancelOrderByUser, purchaseId={}", purchaseId);
+        }
+        // 유저의 환불 이벤트 발행 -> 미구현
         return true;
     }
 
@@ -241,9 +269,16 @@ public class OrderServiceImpl implements OrderService {
         // 주문 취소처리
         orderRequestRepository.findByOrderStatusAndPurchaseId(OrderStatus.NOT_CONFIRM, purchaseId)
                 .orderCancel();
-        // 유저의 환불 이벤트 발행
         // 대기시간 감소
         redisRepository.decreaseWaitingTime(purchase.getStoreId(), purchase.getPurchaseMenuList().size());
+        // 유저에게 주문 취소 푸시알림
+        try {
+            OrderCancelFromStoreVo alertVo = new OrderCancelFromStoreVo(purchase.getUserAccountId(), purchase.getStoreOrderNumber(), OrderStatus.CANCELED.getValue());
+            stringKafkaTemplate.send(ORDER_CANCEL_FROM_STORE_TOPIC, AppConfig.objectMapper().writeValueAsString(alertVo));
+        } catch (JsonProcessingException e) {
+            log.warn("Occurred JsonProcessingException in cancelOrderByStore, purchaseId={}", purchaseId);
+        }
+        // 유저의 환불 이벤트 발행 -> 미구현
         return true;
     }
 
