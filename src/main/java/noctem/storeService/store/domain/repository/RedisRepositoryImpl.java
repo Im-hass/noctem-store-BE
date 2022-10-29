@@ -66,4 +66,11 @@ public class RedisRepositoryImpl implements RedisRepository {
         String key = String.format("%s:%d", ORDER_REQUEST_TIME_KEY_PREFIX, purchaseId);
         return redisStringTemplate.opsForValue().get(key);
     }
+
+    // == dev code ==
+    @Override
+    public void setWaitingTimeToZero(Long storeId) {
+        String key = String.format("%s:%d", WAITING_TIME_KEY_PREFIX, storeId);
+        redisLongTemplate.opsForValue().set(key, 0L);
+    }
 }

@@ -18,4 +18,7 @@ public interface RedisRepository {
     void setOrderRequestTime(Long purchaseId);
 
     String getOrderRequestTime(Long purchaseId);
+
+    // == dev code ==
+    void setWaitingTimeToZero(Long storeId);
 }

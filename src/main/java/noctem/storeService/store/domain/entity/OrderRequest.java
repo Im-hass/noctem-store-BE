@@ -54,4 +54,8 @@ public class OrderRequest extends BaseEntity {
         return this;
     }
 
+    // == dev code ==
+    public void changeCompleteForce() {
+        this.orderStatus = OrderStatus.COMPLETED;
+    }
 }

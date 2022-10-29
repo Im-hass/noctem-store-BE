@@ -322,14 +322,28 @@ public class OrderServiceImpl implements OrderService {
     // == dev 코드 ==
     @Override
     public void orderBatchProcessing() {
-        try {
-            List<OrderRequest> orderList = orderRequestRepository.findAllByOrderStatusAndStoreIdAndIsDeletedFalseAndIsCanceledFalseOrderByOrderRequestDttmAsc(OrderStatus.NOT_CONFIRM, clientInfoLoader.getStoreId());
-            orderList.forEach(e -> {
-                progressToMakingOrderStatus(e.getPurchaseId());
-                progressToCompletedOrderStatus(e.getPurchaseId());
-            });
-        } catch (Exception e) {
-            log.warn("Occurred exception from orderBatchProcessing");
+        for (int k = 1; k <= 7; k++) {
+            Long storeId = Long.valueOf(k);
+            try {
+                orderRequestRepository.findAllByOrderStatusAndStoreIdAndIsDeletedFalseAndIsCanceledFalseOrderByOrderRequestDttmAsc(OrderStatus.NOT_CONFIRM, storeId)
+                        .forEach(e -> {
+                            progressToMakingOrderStatus(e.getPurchaseId());
+                            progressToCompletedOrderStatus(e.getPurchaseId());
+                        });
+            } catch (Exception e) {
+                orderRequestRepository.findAllByOrderStatusAndStoreIdAndIsDeletedFalseAndIsCanceledFalseOrderByOrderRequestDttmAsc(OrderStatus.NOT_CONFIRM, storeId)
+                        .forEach(OrderRequest::changeCompleteForce);
+            }
+            try {
+                orderRequestRepository.findAllByOrderStatusAndStoreIdAndIsDeletedFalseAndIsCanceledFalseOrderByOrderRequestDttmAsc(OrderStatus.MAKING, storeId)
+                        .forEach(e -> {
+                            progressToCompletedOrderStatus(e.getPurchaseId());
+                        });
+            } catch (Exception e) {
+                orderRequestRepository.findAllByOrderStatusAndStoreIdAndIsDeletedFalseAndIsCanceledFalseOrderByOrderRequestDttmAsc(OrderStatus.MAKING, storeId)
+                        .forEach(OrderRequest::changeCompleteForce);
+            }
+            redisRepository.setWaitingTimeToZero(storeId);
         }
 
     }
