@@ -91,11 +91,27 @@ public class OrderController {
                 .build();
     }
 
-    // 예상 대기시간
+    // 매장의 예상 대기시간
     @GetMapping("/waitingTime/{storeId}")
-    public CommonResponse waitingTime(@PathVariable Long storeId) {
+    public CommonResponse storeWaitingTime(@PathVariable Long storeId) {
         return CommonResponse.builder()
-                .data(orderService.getWaitingTime(storeId))
+                .data(orderService.getStoreWaitingTime(storeId))
+                .build();
+    }
+
+    // 유저의 예상 대기시간
+    @GetMapping("/waitingTime/user")
+    public CommonResponse userWaitingTime() {
+        return CommonResponse.builder()
+                .data(orderService.getUserWaitingTime())
+                .build();
+    }
+
+    // 유저의 진행중인 주문 조회
+    @GetMapping("/orderInProgress")
+    public CommonResponse getOrderInProgress() {
+        return CommonResponse.builder()
+                .data(orderService.getOrderInProgress())
                 .build();
     }
 

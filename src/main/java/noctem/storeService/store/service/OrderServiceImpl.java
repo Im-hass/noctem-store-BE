@@ -14,10 +14,7 @@ import noctem.storeService.store.domain.entity.Store;
 import noctem.storeService.store.domain.repository.OrderRequestRepository;
 import noctem.storeService.store.domain.repository.RedisRepository;
 import noctem.storeService.store.domain.repository.StoreRepository;
-import noctem.storeService.store.dto.response.IncreaseUserExpKafkaDto;
-import noctem.storeService.store.dto.response.OrderRequestResDto;
-import noctem.storeService.store.dto.response.OrderStatusResDto;
-import noctem.storeService.store.dto.response.WaitingTimeResDto;
+import noctem.storeService.store.dto.response.*;
 import noctem.storeService.store.dto.vo.OrderCancelFromStoreVo;
 import noctem.storeService.store.dto.vo.OrderCancelFromUserVo;
 import noctem.storeService.store.dto.vo.OrderStatusChangeFromStoreVo;
@@ -153,7 +150,7 @@ public class OrderServiceImpl implements OrderService {
             // 기존 주문 완료처리
             orderRequestRepository.findByOrderStatusAndPurchaseId(OrderStatus.NOT_CONFIRM, purchaseId)
                     .processDone();
-            // 유저에게 push 알림
+            // 유저 알림서버로 전송
             OrderStatusChangeFromStoreVo alertVo = new OrderStatusChangeFromStoreVo(purchase.getUserAccountId(), purchaseId, purchase.getStoreOrderNumber(), OrderStatus.MAKING.getValue());
             stringKafkaTemplate.send(ORDER_STATUS_CHANGE_FROM_STORE_TOPIC, AppConfig.objectMapper().writeValueAsString(alertVo));
             return true;
@@ -195,11 +192,11 @@ public class OrderServiceImpl implements OrderService {
                     .processDone();
             // 유저 등급 경험치 반영
             increaseUserExp(purchase.getUserAccountId(), purchase.getPurchaseTotalPrice());
-            // 대기시간 감소
-            redisRepository.decreaseWaitingTime(purchase.getStoreId(), purchase.getPurchaseMenuList().size());
             // '제조완료' 변경
             redisRepository.setOrderStatus(purchaseId, OrderStatus.COMPLETED);
-            // 유저에게 push 알림
+            // 진행중인 주문에서 삭제
+            redisRepository.delOrderInProgress(purchase.getUserAccountId());
+            // 유저 알림서버로 전송
             OrderStatusChangeFromStoreVo alertVo = new OrderStatusChangeFromStoreVo(purchase.getUserAccountId(), purchaseId, purchase.getStoreOrderNumber(), OrderStatus.COMPLETED.getValue());
             stringKafkaTemplate.send(ORDER_STATUS_CHANGE_FROM_STORE_TOPIC, AppConfig.objectMapper().writeValueAsString(alertVo));
             return true;
@@ -235,8 +232,8 @@ public class OrderServiceImpl implements OrderService {
         // 주문 취소처리
         orderRequestRepository.findByOrderStatusAndPurchaseId(OrderStatus.NOT_CONFIRM, purchaseId)
                 .orderCancel();
-        // 대기시간 감소
-        redisRepository.decreaseWaitingTime(purchase.getStoreId(), purchase.getPurchaseMenuList().size());
+        // 진행중인 주문에서 삭제
+        redisRepository.delOrderInProgress(purchase.getUserAccountId());
         // 매장에 주문 취소 푸시알림
         try {
             OrderCancelFromUserVo alertVo = new OrderCancelFromUserVo(purchase.getStoreId(), purchase.getStoreOrderNumber(), purchase.getUserAccountId());
@@ -269,8 +266,8 @@ public class OrderServiceImpl implements OrderService {
         // 주문 취소처리
         orderRequestRepository.findByOrderStatusAndPurchaseId(OrderStatus.NOT_CONFIRM, purchaseId)
                 .orderCancel();
-        // 대기시간 감소
-        redisRepository.decreaseWaitingTime(purchase.getStoreId(), purchase.getPurchaseMenuList().size());
+        // 진행중인 주문에서 삭제
+        redisRepository.delOrderInProgress(purchase.getUserAccountId());
         // 유저에게 주문 취소 푸시알림
         try {
             OrderCancelFromStoreVo alertVo = new OrderCancelFromStoreVo(purchase.getUserAccountId(), purchase.getStoreOrderNumber(), OrderStatus.CANCELED.getValue());
@@ -284,9 +281,45 @@ public class OrderServiceImpl implements OrderService {
 
     @Transactional(readOnly = true)
     @Override
-    public WaitingTimeResDto getWaitingTime(Long storeId) {
-        Long waitingTime = redisRepository.getWaitingTime(storeId);
-        return waitingTime == null ? new WaitingTimeResDto(0L) : new WaitingTimeResDto(waitingTime);
+    public WaitingTimeStoreResDto getStoreWaitingTime(Long storeId) {
+        Long waitingPeople = orderRequestRepository.countByStoreIdAndOrderStatusInAndIsDeletedFalseAndIsCanceledFalse(
+                storeId, Arrays.asList(OrderStatus.NOT_CONFIRM, OrderStatus.MAKING));
+        return new WaitingTimeStoreResDto(waitingPeople.intValue(), 90 * waitingPeople);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public WaitingTimeUserResDto getUserWaitingTime() {
+        Long purchaseId = redisRepository.getPurchaseIdOrderInProgress(clientInfoLoader.getUserAccountId());
+        // 현재 진행중인 주문이 없을 경우
+        if (purchaseId == null) {
+            return new WaitingTimeUserResDto(null, null);
+        }
+        Long storeId = purchaseRepository.findById(purchaseId).get().getStoreId();
+        List<OrderRequest> orderRequestList = orderRequestRepository.findAllByStoreIdAndOrderStatusInAndIsDeletedFalseAndIsCanceledFalseOrderByOrderRequestDttmAsc(
+                storeId, Arrays.asList(OrderStatus.NOT_CONFIRM, OrderStatus.MAKING)
+        );
+        Integer myOrderNumber = 0;
+        for (OrderRequest orderRequest : orderRequestList) {
+            if (Objects.equals(orderRequest.getPurchaseId(), purchaseId)) {
+                myOrderNumber = orderRequestList.indexOf(orderRequest) + 1;
+            }
+        }
+        return new WaitingTimeUserResDto(myOrderNumber, 90L * (myOrderNumber));
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public OrderProgressResDto getOrderInProgress() {
+        Long purchaseId = redisRepository.getPurchaseIdOrderInProgress(clientInfoLoader.getUserAccountId());
+        // 현재 진행중인 주문이 없을 경우
+        if (purchaseId == null) {
+            return new OrderProgressResDto(null, null, null);
+        }
+        return new OrderProgressResDto(
+                purchaseRepository.findById(purchaseId).get().getStoreId(),
+                purchaseId,
+                redisRepository.getOrderStatus(purchaseId));
     }
 
     // 유저 본인의 주문이 맞는지 확인
@@ -330,20 +363,27 @@ public class OrderServiceImpl implements OrderService {
                             progressToMakingOrderStatus(e.getPurchaseId());
                             progressToCompletedOrderStatus(e.getPurchaseId());
                         });
-            } catch (Exception e) {
+            } catch (Exception ex) {
                 orderRequestRepository.findAllByOrderStatusAndStoreIdAndIsDeletedFalseAndIsCanceledFalseOrderByOrderRequestDttmAsc(OrderStatus.NOT_CONFIRM, storeId)
-                        .forEach(OrderRequest::changeCompleteForce);
+                        .forEach(e -> {
+                            e.changeCompleteForce();
+                            redisRepository.delOrderInProgress(purchaseRepository.findById(e.getPurchaseId()).get()
+                                    .getUserAccountId());
+                        });
             }
             try {
                 orderRequestRepository.findAllByOrderStatusAndStoreIdAndIsDeletedFalseAndIsCanceledFalseOrderByOrderRequestDttmAsc(OrderStatus.MAKING, storeId)
                         .forEach(e -> {
                             progressToCompletedOrderStatus(e.getPurchaseId());
                         });
-            } catch (Exception e) {
+            } catch (Exception ex) {
                 orderRequestRepository.findAllByOrderStatusAndStoreIdAndIsDeletedFalseAndIsCanceledFalseOrderByOrderRequestDttmAsc(OrderStatus.MAKING, storeId)
-                        .forEach(OrderRequest::changeCompleteForce);
+                        .forEach(e -> {
+                            e.changeCompleteForce();
+                            redisRepository.delOrderInProgress(purchaseRepository.findById(e.getPurchaseId()).get()
+                                    .getUserAccountId());
+                        });
             }
-            redisRepository.setWaitingTimeToZero(storeId);
         }
 
     }

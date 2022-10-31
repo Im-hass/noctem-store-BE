@@ -21,7 +21,11 @@ public interface OrderService {
 
     Boolean cancelOrderByStore(Long purchaseId);
 
-    WaitingTimeResDto getWaitingTime(Long storeId);
+    WaitingTimeStoreResDto getStoreWaitingTime(Long storeId);
+
+    WaitingTimeUserResDto getUserWaitingTime();
+
+    OrderProgressResDto getOrderInProgress();
 
     void orderBatchProcessing();
 }

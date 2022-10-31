@@ -17,6 +17,7 @@ public class RedisRepositoryImpl implements RedisRepository {
     private final String WAITING_TIME_KEY_PREFIX = "waitingTime";
     private final String ORDER_STATUS_KEY_PREFIX = "orderStatus";
     private final String ORDER_REQUEST_TIME_KEY_PREFIX = "orderRequestTime";
+    private final String ORDER_IN_PROGRESS_KEY_PREFIX = "orderInProgress";
     private final RedisTemplate<String, Long> redisLongTemplate;
     private final RedisTemplate<String, String> redisStringTemplate;
 
@@ -65,6 +66,24 @@ public class RedisRepositoryImpl implements RedisRepository {
     public String getOrderRequestTime(Long purchaseId) {
         String key = String.format("%s:%d", ORDER_REQUEST_TIME_KEY_PREFIX, purchaseId);
         return redisStringTemplate.opsForValue().get(key);
+    }
+
+    @Override
+    public void setOrderInProgress(Long userAccountId, Long purchaseId) {
+        String key = String.format("%s:%d", ORDER_IN_PROGRESS_KEY_PREFIX, userAccountId);
+        redisLongTemplate.opsForValue().set(key, purchaseId);
+    }
+
+    @Override
+    public Long getPurchaseIdOrderInProgress(Long userAccountId) {
+        String key = String.format("%s:%d", ORDER_IN_PROGRESS_KEY_PREFIX, userAccountId);
+        return redisLongTemplate.opsForValue().get(key);
+    }
+
+    @Override
+    public void delOrderInProgress(Long userAccountId) {
+        String key = String.format("%s:%d", ORDER_IN_PROGRESS_KEY_PREFIX, userAccountId);
+        redisLongTemplate.opsForValue().getAndDelete(key);
     }
 
     // == dev code ==

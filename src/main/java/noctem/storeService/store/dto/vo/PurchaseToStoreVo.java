@@ -10,4 +10,6 @@ import lombok.NoArgsConstructor;
 public class PurchaseToStoreVo {
     private Long storeId;
     private Long purchaseId;
+    private String menuFullName;
+    private Integer totalMenuQty;
 }

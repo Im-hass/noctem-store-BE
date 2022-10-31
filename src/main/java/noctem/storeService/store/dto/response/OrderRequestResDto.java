@@ -16,7 +16,7 @@ public class OrderRequestResDto {
     private Integer orderTotalQty; // 총 메뉴 개수
     private List<InnerDto.MenuResDto> menuList;
     private String userNickname;
-    private Integer orderNumber; // storeOrderNumber
+    private String orderNumber; // storeOrderNumber
     private String orderRequestTime; // 매장에 주문이 최초로 들어간 시간
 
     public OrderRequestResDto(Purchase purchase, String orderRequestTime) {
@@ -26,7 +26,7 @@ public class OrderRequestResDto {
         this.menuList = purchase.getPurchaseMenuList().stream().map(InnerDto.MenuResDto::new).collect(Collectors.toList());
         menuList.forEach(e -> e.setIndex(menuList.indexOf(e)));
         this.userNickname = purchase.getUserNickname();
-        this.orderNumber = purchase.getStoreOrderNumber();
+        this.orderNumber = String.format("A-%s", purchase.getStoreOrderNumber());
         this.orderRequestTime = orderRequestTime;
     }
 }
