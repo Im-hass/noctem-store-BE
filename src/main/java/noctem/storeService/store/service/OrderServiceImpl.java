@@ -293,9 +293,10 @@ public class OrderServiceImpl implements OrderService {
         Long purchaseId = redisRepository.getPurchaseIdOrderInProgress(clientInfoLoader.getUserAccountId());
         // 현재 진행중인 주문이 없을 경우
         if (purchaseId == null) {
-            return new WaitingTimeUserResDto(null, null);
+            return new WaitingTimeUserResDto(null, null, null);
         }
-        Long storeId = purchaseRepository.findById(purchaseId).get().getStoreId();
+        Purchase purchase = purchaseRepository.findById(purchaseId).get();
+        Long storeId = purchase.getStoreId();
         List<OrderRequest> orderRequestList = orderRequestRepository.findAllByStoreIdAndOrderStatusInAndIsDeletedFalseAndIsCanceledFalseOrderByOrderRequestDttmAsc(
                 storeId, Arrays.asList(OrderStatus.NOT_CONFIRM, OrderStatus.MAKING)
         );
@@ -305,7 +306,7 @@ public class OrderServiceImpl implements OrderService {
                 myOrderNumber = orderRequestList.indexOf(orderRequest) + 1;
             }
         }
-        return new WaitingTimeUserResDto(myOrderNumber, 90L * (myOrderNumber));
+        return new WaitingTimeUserResDto(purchase.getStoreOrderNumber(), myOrderNumber, 90L * (myOrderNumber));
     }
 
     @Transactional(readOnly = true)
