@@ -21,27 +21,6 @@ jib {
             password = System.getenv("DOCKERHUB_PW")
         }
     }
-    container {
-        volumes = ["/tmp"]
-        environment = [
-                "NOCTEM_DB_USERNAME"          : System.getenv("NOCTEM_DB_USERNAME"),
-                "NOCTEM_DB_PASSWORD"          : System.getenv("NOCTEM_DB_PASSWORD"),
-                "NOCTEM_DB_READ_ONLY_USERNAME": System.getenv("NOCTEM_DB_READ_ONLY_USERNAME"),
-                "NOCTEM_DB_READ_ONLY_PASSWORD": System.getenv("NOCTEM_DB_READ_ONLY_PASSWORD"),
-                "NOCTEM_JWT_SIGNER"           : System.getenv("NOCTEM_JWT_SIGNER"),
-                "EUREKA_SERVER"               : "eureka",
-                "MYSQL_SERVER"                : "mysqldb",
-                "KAFKA_SERVER"                : "kafka",
-                "CONFIG_SERVER"               : "config",
-                "REDIS_SERVER"                : "redis",
-                "USER_SERVICE"                : "user-service",
-                "PURCHASE_SERVICE"            : "purchase-service",
-                "MENU_SERVICE"                : "menu-service",
-                "STORE_SERVICE"               : "store-service",
-                "ADMIN_SERVICE"               : "admin-service",
-                "GIFT_SERVICE"                : "gift-service"
-        ]
-    }
 }
 
 group = 'noctem'
