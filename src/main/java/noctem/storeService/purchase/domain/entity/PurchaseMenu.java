@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import noctem.storeService.global.common.BaseEntity;
+import noctem.storeService.global.enumeration.CategorySmall;
 import noctem.storeService.global.enumeration.CupType;
 
 import javax.persistence.*;
@@ -24,6 +25,8 @@ public class PurchaseMenu extends BaseEntity {
     @Column(name = "purchase_menu_id")
     private Long id;
     private Long sizeId;
+    @Enumerated(EnumType.STRING)
+    private CategorySmall categorySmall;
     private String menuFullName;
     private String menuShortName;
     private String temperature;
@@ -42,8 +45,9 @@ public class PurchaseMenu extends BaseEntity {
     private Purchase purchase;
 
     @Builder
-    public PurchaseMenu(Long sizeId, String menuFullName, String menuShortName, CupType cupType, Integer qty, Integer menuTotalPrice) {
+    public PurchaseMenu(Long sizeId, CategorySmall categorySmall, String menuFullName, String menuShortName, CupType cupType, Integer qty, Integer menuTotalPrice) {
         this.sizeId = sizeId;
+        this.categorySmall = categorySmall;
         this.menuFullName = menuFullName;
         this.menuShortName = menuShortName;
         this.cupType = cupType;
