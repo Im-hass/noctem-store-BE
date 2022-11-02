@@ -11,33 +11,49 @@
 ## 🍜 초기 구상 아키텍처
 ![](https://github.com/arotein/noctem-eureka-BE/raw/main/img/%EC%B4%88%EA%B8%B0%EA%B5%AC%EC%83%81.png)
 - 개발일정을 고려하여 Tracing, Logging 부분은 미구현.
-- MicroService Architecture로 구상하였으나 개발일정을 고려하여 MiniService Architecture로 변경
 
 ## 🍜 Repository URL
+
 - eureka server
-https://github.com/arotein/noctem-eureka-BE.git
+  https://github.com/arotein/noctem-eureka-BE.git
 
 - gateway server
-https://github.com/arotein/noctem-gateway-BE.git
+  https://github.com/arotein/noctem-gateway-BE.git
 
 - config server
-https://github.com/arotein/noctem-config-server-BE.git
+  https://github.com/arotein/noctem-config-server-BE.git
+
+- alert server
+  https://github.com/arotein/noctem-alert-BE.git
+
+- batch server
+  https://github.com/arotein/noctem-batch-BE.git
 
 - user service
-https://github.com/arotein/noctem-user-BE.git
+  https://github.com/arotein/noctem-user-BE.git
 
 - store service
-https://github.com/arotein/noctem-store-BE.git
+  https://github.com/arotein/noctem-store-BE.git
 
 - menu service
-https://github.com/arotein/noctem-menu-BE.git
+  https://github.com/arotein/noctem-menu-BE.git
 
 - purchase service
-https://github.com/arotein/noctem-purchase-BE.git
+  https://github.com/arotein/noctem-purchase-BE.git
+
+- admin service
+  https://github.com/arotein/noctem-admin-BE.git
 
 ## 결과물(2022.11.11일까지 접속가능)
-- Front Server
-https://noctem-user1-fe.vercel.app/
 
-- API Server
-https://noctem.click/ 
+- Front User Server
+  https://noctem-user1-fe.vercel.app/
+
+- Front Admin Server
+  https://noctem-admin-fe.vercel.app/
+
+- API Server(Home Server)
+  https://noctem.click/
+
+- API Server(AWS EC2 Server)
+  https://aws.noctem.click/ 

@@ -323,6 +323,20 @@ public class OrderServiceImpl implements OrderService {
                 redisRepository.getOrderStatus(purchaseId));
     }
 
+    @Transactional(readOnly = true)
+    @Override
+    public List<OrderMenuInProgressResDto> getOrderMenuInProgress() {
+        Long purchaseId = redisRepository.getPurchaseIdOrderInProgress(clientInfoLoader.getUserAccountId());
+        // 현재 진행중인 주문이 없을 경우
+        if (purchaseId == null) {
+            return new ArrayList<>();
+        }
+        return purchaseRepository.findById(purchaseId).get()
+                .getPurchaseMenuList()
+                .stream().map(OrderMenuInProgressResDto::new)
+                .collect(Collectors.toList());
+    }
+
     // 유저 본인의 주문이 맞는지 확인
     private Purchase userIdentificationByPurchaseId(Long purchaseId) {
         Optional<Purchase> purchase = purchaseRepository.findById(purchaseId);

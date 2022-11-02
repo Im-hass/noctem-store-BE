@@ -27,5 +27,7 @@ public interface OrderService {
 
     OrderProgressResDto getOrderInProgress();
 
+    List<OrderMenuInProgressResDto> getOrderMenuInProgress();
+
     void orderBatchProcessing();
 }

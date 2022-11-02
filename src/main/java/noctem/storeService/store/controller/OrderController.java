@@ -3,6 +3,7 @@ package noctem.storeService.store.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import noctem.storeService.global.common.CommonResponse;
+import noctem.storeService.store.dto.response.OrderMenuInProgressResDto;
 import noctem.storeService.store.dto.response.OrderRequestResDto;
 import noctem.storeService.store.service.OrderService;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,6 +19,7 @@ public class OrderController {
     private final OrderService orderService;
 
     // 자기 매장의 '주문확인중' 목록 조회
+    @PreAuthorize("hasRole('STORE')")
     @GetMapping("/notConfirm")
     public CommonResponse getNotConfirmOrders() {
         List<OrderRequestResDto> dtoList = orderService.getNotConfirmOrders();
@@ -28,6 +30,7 @@ public class OrderController {
     }
 
     // 자기 매장의 '제조중' 목록 조회
+    @PreAuthorize("hasRole('STORE')")
     @GetMapping("/making")
     public CommonResponse getMakingOrders() {
         List<OrderRequestResDto> dtoList = orderService.getMakingOrders();
@@ -38,6 +41,7 @@ public class OrderController {
     }
 
     // 자기 매장의 '제조완료' 목록 조회 (5개)
+    @PreAuthorize("hasRole('STORE')")
     @GetMapping("/completed")
     public CommonResponse getCompletedOrders() {
         List<OrderRequestResDto> dtoList = orderService.getCompletedOrders();
@@ -100,6 +104,7 @@ public class OrderController {
     }
 
     // 유저의 예상 대기시간
+    @PreAuthorize("hasRole('USER')")
     @GetMapping("/waitingTime/user")
     public CommonResponse userWaitingTime() {
         return CommonResponse.builder()
@@ -108,10 +113,22 @@ public class OrderController {
     }
 
     // 유저의 진행중인 주문 조회
+    @PreAuthorize("hasRole('USER')")
     @GetMapping("/orderInProgress")
     public CommonResponse getOrderInProgress() {
         return CommonResponse.builder()
                 .data(orderService.getOrderInProgress())
+                .build();
+    }
+
+    // 유저의 진행중인 주문의 메뉴 조회
+    @PreAuthorize("hasRole('USER')")
+    @GetMapping("/orderMenuInProgress")
+    public CommonResponse getOrderMenuInProgress() {
+        List<OrderMenuInProgressResDto> dtoList = orderService.getOrderMenuInProgress();
+        dtoList.forEach(e -> e.setIndex(dtoList.indexOf(e)));
+        return CommonResponse.builder()
+                .data(dtoList)
                 .build();
     }
 
