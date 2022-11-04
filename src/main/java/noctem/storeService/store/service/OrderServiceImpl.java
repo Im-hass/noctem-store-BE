@@ -372,33 +372,28 @@ public class OrderServiceImpl implements OrderService {
     public void orderBatchProcessing() {
         for (int k = 1; k <= 7; k++) {
             Long storeId = Long.valueOf(k);
-            try {
-                orderRequestRepository.findAllByOrderStatusAndStoreIdAndIsDeletedFalseAndIsCanceledFalseOrderByOrderRequestDttmAsc(OrderStatus.NOT_CONFIRM, storeId)
-                        .forEach(e -> {
+            orderRequestRepository.findAllByOrderStatusAndStoreIdAndIsDeletedFalseAndIsCanceledFalseOrderByOrderRequestDttmAsc(OrderStatus.NOT_CONFIRM, storeId)
+                    .forEach(e -> {
+                        try {
                             progressToMakingOrderStatus(e.getPurchaseId());
                             progressToCompletedOrderStatus(e.getPurchaseId());
-                        });
-            } catch (Exception ex) {
-                orderRequestRepository.findAllByOrderStatusAndStoreIdAndIsDeletedFalseAndIsCanceledFalseOrderByOrderRequestDttmAsc(OrderStatus.NOT_CONFIRM, storeId)
-                        .forEach(e -> {
+                        } catch (Exception ex) {
                             e.changeCompleteForce();
                             redisRepository.delOrderInProgress(purchaseRepository.findById(e.getPurchaseId()).get()
                                     .getUserAccountId());
-                        });
-            }
-            try {
-                orderRequestRepository.findAllByOrderStatusAndStoreIdAndIsDeletedFalseAndIsCanceledFalseOrderByOrderRequestDttmAsc(OrderStatus.MAKING, storeId)
-                        .forEach(e -> {
+                        }
+                    });
+
+            orderRequestRepository.findAllByOrderStatusAndStoreIdAndIsDeletedFalseAndIsCanceledFalseOrderByOrderRequestDttmAsc(OrderStatus.MAKING, storeId)
+                    .forEach(e -> {
+                        try {
                             progressToCompletedOrderStatus(e.getPurchaseId());
-                        });
-            } catch (Exception ex) {
-                orderRequestRepository.findAllByOrderStatusAndStoreIdAndIsDeletedFalseAndIsCanceledFalseOrderByOrderRequestDttmAsc(OrderStatus.MAKING, storeId)
-                        .forEach(e -> {
+                        } catch (Exception ex) {
                             e.changeCompleteForce();
                             redisRepository.delOrderInProgress(purchaseRepository.findById(e.getPurchaseId()).get()
                                     .getUserAccountId());
-                        });
-            }
+                        }
+                    });
         }
 
     }
