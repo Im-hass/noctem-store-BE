@@ -21,23 +21,6 @@ public class RedisRepositoryImpl implements RedisRepository {
     private final RedisTemplate<String, Long> redisLongTemplate;
     private final RedisTemplate<String, String> redisStringTemplate;
 
-    public Long increaseWaitingTime(Long storeId, Integer orderQty) {
-        String key = String.format("%s:%d", WAITING_TIME_KEY_PREFIX, storeId);
-        redisLongTemplate.opsForValue().increment(key, orderQty * 90L);
-        return redisLongTemplate.opsForValue().get(key);
-    }
-
-    public Long decreaseWaitingTime(Long storeId, Integer orderQty) {
-        String key = String.format("%s:%d", WAITING_TIME_KEY_PREFIX, storeId);
-        redisLongTemplate.opsForValue().decrement(key, orderQty * 90L);
-        return redisLongTemplate.opsForValue().get(key);
-    }
-
-    public Long getWaitingTime(Long storeId) {
-        String key = String.format("%s:%d", WAITING_TIME_KEY_PREFIX, storeId);
-        return redisLongTemplate.opsForValue().get(key);
-    }
-
     public String getOrderStatus(Long purchaseId) {
         String key = String.format("%s:%d", ORDER_STATUS_KEY_PREFIX, purchaseId);
         return redisStringTemplate.opsForValue().get(key);
@@ -84,12 +67,5 @@ public class RedisRepositoryImpl implements RedisRepository {
     public void delOrderInProgress(Long userAccountId) {
         String key = String.format("%s:%d", ORDER_IN_PROGRESS_KEY_PREFIX, userAccountId);
         redisLongTemplate.opsForValue().getAndDelete(key);
-    }
-
-    // == dev code ==
-    @Override
-    public void setWaitingTimeToZero(Long storeId) {
-        String key = String.format("%s:%d", WAITING_TIME_KEY_PREFIX, storeId);
-        redisLongTemplate.opsForValue().set(key, 0L);
     }
 }

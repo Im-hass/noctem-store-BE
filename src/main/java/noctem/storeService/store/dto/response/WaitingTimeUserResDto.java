@@ -13,7 +13,7 @@ public class WaitingTimeUserResDto {
     private Long waitingTime;
 
     public WaitingTimeUserResDto(Integer orderNumber, Integer turnNumber, Long waitingTime) {
-        this.orderNumber = String.format("A-%d", orderNumber);
+        this.orderNumber = orderNumber == null ? null : String.format("A-%d", orderNumber);
         this.turnNumber = turnNumber;
         this.waitingTime = waitingTime;
     }

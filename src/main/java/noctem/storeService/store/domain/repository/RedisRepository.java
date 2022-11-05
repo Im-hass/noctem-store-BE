@@ -3,12 +3,6 @@ package noctem.storeService.store.domain.repository;
 import noctem.storeService.global.enumeration.OrderStatus;
 
 public interface RedisRepository {
-    Long increaseWaitingTime(Long storeId, Integer orderQty);
-
-    Long decreaseWaitingTime(Long storeId, Integer orderQty);
-
-    Long getWaitingTime(Long storeId);
-
     String getOrderStatus(Long purchaseId);
 
     void setOrderStatus(Long purchaseId, OrderStatus orderStatus);
@@ -24,7 +18,4 @@ public interface RedisRepository {
     Long getPurchaseIdOrderInProgress(Long userAccountId);
 
     void delOrderInProgress(Long userAccountId);
-
-    // == dev code ==
-    void setWaitingTimeToZero(Long storeId);
 }
