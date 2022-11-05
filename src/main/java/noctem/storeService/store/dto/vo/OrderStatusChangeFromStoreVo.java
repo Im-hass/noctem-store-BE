@@ -6,6 +6,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class OrderStatusChangeFromStoreVo {
+    private Long storeId;
     private Long userAccountId;
     private Long purchaseId;
     private Integer orderNumber;

@@ -2,6 +2,8 @@ package noctem.storeService.store.domain.repository;
 
 import noctem.storeService.global.enumeration.OrderStatus;
 
+import java.time.LocalDateTime;
+
 public interface RedisRepository {
     String getOrderStatus(Long purchaseId);
 
@@ -9,7 +11,7 @@ public interface RedisRepository {
 
     String getSetOrderStatus(Long purchaseId, OrderStatus orderStatus);
 
-    void setOrderRequestTime(Long purchaseId);
+    void setOrderRequestTime(Long purchaseId, LocalDateTime dateTime);
 
     String getOrderRequestTime(Long purchaseId);
 

@@ -10,9 +10,9 @@ import lombok.Data;
 public class WaitingTimeUserResDto {
     private String orderNumber;
     private Integer turnNumber;
-    private Long waitingTime;
+    private Integer waitingTime;
 
-    public WaitingTimeUserResDto(Integer orderNumber, Integer turnNumber, Long waitingTime) {
+    public WaitingTimeUserResDto(Integer orderNumber, Integer turnNumber, Integer waitingTime) {
         this.orderNumber = orderNumber == null ? null : String.format("A-%d", orderNumber);
         this.turnNumber = turnNumber;
         this.waitingTime = waitingTime;

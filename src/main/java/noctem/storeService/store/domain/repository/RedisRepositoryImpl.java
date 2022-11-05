@@ -5,8 +5,7 @@ import noctem.storeService.global.enumeration.OrderStatus;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
 
 /***
  * waiting time 단위: second
@@ -39,9 +38,9 @@ public class RedisRepositoryImpl implements RedisRepository {
 
     // redis 최초 주문요청된 시간 저장
     @Override
-    public void setOrderRequestTime(Long purchaseId) {
+    public void setOrderRequestTime(Long purchaseId, LocalDateTime dateTime) {
         String key = String.format("%s:%d", ORDER_REQUEST_TIME_KEY_PREFIX, purchaseId);
-        String time = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+        String time = dateTime.toString();
         redisStringTemplate.opsForValue().set(key, time);
     }
 

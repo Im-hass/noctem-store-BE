@@ -6,6 +6,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class OrderCancelFromStoreVo {
+    private Long storeId;
     private Long userAccountId;
     private Integer orderNumber;
     private String orderStatus;

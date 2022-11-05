@@ -5,6 +5,8 @@ import lombok.Data;
 import noctem.storeService.purchase.domain.entity.Purchase;
 import noctem.storeService.store.dto.InnerDto;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,6 +29,6 @@ public class OrderRequestResDto {
         menuList.forEach(e -> e.setIndex(menuList.indexOf(e)));
         this.userNickname = purchase.getUserNickname();
         this.orderNumber = String.format("A-%s", purchase.getStoreOrderNumber());
-        this.orderRequestTime = orderRequestTime;
+        this.orderRequestTime = LocalDateTime.parse(orderRequestTime).format(DateTimeFormatter.ofPattern("HH:mm:ss"));
     }
 }

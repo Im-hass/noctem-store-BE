@@ -31,10 +31,10 @@ public class OrderRequest extends BaseEntity {
     private Store store;
 
     @Builder
-    public OrderRequest(Long purchaseId, OrderStatus orderStatus) {
+    public OrderRequest(Long purchaseId, OrderStatus orderStatus, LocalDateTime orderRequestDttm) {
         this.purchaseId = purchaseId;
         this.orderStatus = orderStatus;
-        this.orderRequestDttm = LocalDateTime.now();
+        this.orderRequestDttm = orderRequestDttm;
         this.isCanceled = false;
     }
 

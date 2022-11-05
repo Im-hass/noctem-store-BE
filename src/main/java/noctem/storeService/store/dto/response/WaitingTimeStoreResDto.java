@@ -6,6 +6,6 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class WaitingTimeStoreResDto {
-    private Integer waitingPeople;
-    private Long waitingTime;
+    private Integer waitingOrderCount;
+    private Integer waitingTime;
 }

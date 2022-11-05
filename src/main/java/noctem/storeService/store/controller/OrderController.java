@@ -9,6 +9,7 @@ import noctem.storeService.store.service.OrderService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 
 @Slf4j
@@ -45,6 +46,7 @@ public class OrderController {
     @GetMapping("/completed")
     public CommonResponse getCompletedOrders() {
         List<OrderRequestResDto> dtoList = orderService.getCompletedOrders();
+        Collections.reverse(dtoList);
         dtoList.forEach(e -> e.setIndex(dtoList.indexOf(e)));
         return CommonResponse.builder()
                 .data(dtoList)

@@ -8,6 +8,7 @@ import noctem.storeService.global.common.CommonException;
 import noctem.storeService.global.enumeration.OrderStatus;
 import noctem.storeService.global.security.bean.ClientInfoLoader;
 import noctem.storeService.purchase.domain.entity.Purchase;
+import noctem.storeService.purchase.domain.repository.PurchaseMenuRepository;
 import noctem.storeService.purchase.domain.repository.PurchaseRepository;
 import noctem.storeService.store.domain.entity.OrderRequest;
 import noctem.storeService.store.domain.entity.Store;
@@ -23,6 +24,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -41,6 +43,7 @@ public class OrderServiceImpl implements OrderService {
     private final ClientInfoLoader clientInfoLoader;
     private final RedisRepository redisRepository;
     private final PurchaseRepository purchaseRepository;
+    private final PurchaseMenuRepository purchaseMenuRepository;
     private final OrderRequestRepository orderRequestRepository;
     private final StoreRepository storeRepository;
     private final String PURCHASE_FROM_USER_TOPIC = "purchase-from-user-alert";
@@ -143,15 +146,18 @@ public class OrderServiceImpl implements OrderService {
             OrderRequest orderRequest = OrderRequest.builder()
                     .purchaseId(purchaseId)
                     .orderStatus(OrderStatus.MAKING)
+                    .orderRequestDttm(LocalDateTime.parse(redisRepository.getOrderRequestTime(purchaseId)))
                     .build();
             Store store = storeRepository.findById(clientInfoLoader.getStoreId()).get()
                     .linkToOrderRequest(orderRequest);
             orderRequestRepository.save(orderRequest);
             // 기존 주문 완료처리
-            orderRequestRepository.findByOrderStatusAndPurchaseId(OrderStatus.NOT_CONFIRM, purchaseId)
-                    .processDone();
+            OrderRequest notConfirmOrderRequest = orderRequestRepository.findByOrderStatusAndPurchaseId(OrderStatus.NOT_CONFIRM, purchaseId);
+            if (notConfirmOrderRequest != null) {
+                notConfirmOrderRequest.processDone();
+            }
             // 유저 알림서버로 전송
-            OrderStatusChangeFromStoreVo alertVo = new OrderStatusChangeFromStoreVo(purchase.getUserAccountId(), purchaseId, purchase.getStoreOrderNumber(), OrderStatus.MAKING.getValue());
+            OrderStatusChangeFromStoreVo alertVo = new OrderStatusChangeFromStoreVo(purchase.getStoreId(), purchase.getUserAccountId(), purchaseId, purchase.getStoreOrderNumber(), OrderStatus.MAKING.getValue());
             stringKafkaTemplate.send(ORDER_STATUS_CHANGE_FROM_STORE_TOPIC, AppConfig.objectMapper().writeValueAsString(alertVo));
             return true;
         } catch (NullPointerException e) {
@@ -182,14 +188,17 @@ public class OrderServiceImpl implements OrderService {
             // 주문 COMPLETED로 저장
             OrderRequest orderRequest = OrderRequest.builder()
                     .purchaseId(purchaseId)
+                    .orderRequestDttm(LocalDateTime.parse(redisRepository.getOrderRequestTime(purchaseId)))
                     .orderStatus(OrderStatus.COMPLETED)
                     .build();
             storeRepository.findById(clientInfoLoader.getStoreId()).get()
                     .linkToOrderRequest(orderRequest);
             orderRequestRepository.save(orderRequest);
             // 기존 주문 완료처리
-            orderRequestRepository.findByOrderStatusAndPurchaseId(OrderStatus.MAKING, purchaseId)
-                    .processDone();
+            OrderRequest makingOrderRequest = orderRequestRepository.findByOrderStatusAndPurchaseId(OrderStatus.MAKING, purchaseId);
+            if (makingOrderRequest != null) {
+                makingOrderRequest.processDone();
+            }
             // 유저 등급 경험치 반영
             increaseUserExp(purchase.getUserAccountId(), purchase.getPurchaseTotalPrice());
             // '제조완료' 변경
@@ -197,7 +206,7 @@ public class OrderServiceImpl implements OrderService {
             // 진행중인 주문에서 삭제
             redisRepository.delOrderInProgress(purchase.getUserAccountId());
             // 유저 알림서버로 전송
-            OrderStatusChangeFromStoreVo alertVo = new OrderStatusChangeFromStoreVo(purchase.getUserAccountId(), purchaseId, purchase.getStoreOrderNumber(), OrderStatus.COMPLETED.getValue());
+            OrderStatusChangeFromStoreVo alertVo = new OrderStatusChangeFromStoreVo(purchase.getStoreId(), purchase.getUserAccountId(), purchaseId, purchase.getStoreOrderNumber(), OrderStatus.COMPLETED.getValue());
             stringKafkaTemplate.send(ORDER_STATUS_CHANGE_FROM_STORE_TOPIC, AppConfig.objectMapper().writeValueAsString(alertVo));
             return true;
         } catch (NullPointerException e) {
@@ -270,7 +279,7 @@ public class OrderServiceImpl implements OrderService {
         redisRepository.delOrderInProgress(purchase.getUserAccountId());
         // 유저에게 주문 취소 푸시알림
         try {
-            OrderCancelFromStoreVo alertVo = new OrderCancelFromStoreVo(purchase.getUserAccountId(), purchase.getStoreOrderNumber(), OrderStatus.CANCELED.getValue());
+            OrderCancelFromStoreVo alertVo = new OrderCancelFromStoreVo(purchase.getStoreId(), purchase.getUserAccountId(), purchase.getStoreOrderNumber(), OrderStatus.CANCELED.getValue());
             stringKafkaTemplate.send(ORDER_CANCEL_FROM_STORE_TOPIC, AppConfig.objectMapper().writeValueAsString(alertVo));
         } catch (JsonProcessingException e) {
             log.warn("Occurred JsonProcessingException in cancelOrderByStore, purchaseId={}", purchaseId);
@@ -282,9 +291,12 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(readOnly = true)
     @Override
     public WaitingTimeStoreResDto getStoreWaitingTime(Long storeId) {
-        Long waitingPeople = orderRequestRepository.countByStoreIdAndOrderStatusInAndIsDeletedFalseAndIsCanceledFalse(
+        List<OrderRequest> orderRequestList = orderRequestRepository.findAllByStore_IdAndOrderStatusInAndIsDeletedFalseAndIsCanceledFalse(
                 storeId, Arrays.asList(OrderStatus.NOT_CONFIRM, OrderStatus.MAKING));
-        return new WaitingTimeStoreResDto(waitingPeople.intValue(), 90 * waitingPeople);
+        Long menuCount = purchaseMenuRepository.countByPurchase_IdIn(
+                orderRequestList.stream().map(OrderRequest::getPurchaseId).collect(Collectors.toList())
+        );
+        return new WaitingTimeStoreResDto(menuCount.intValue(), 90 * menuCount.intValue());
     }
 
     @Transactional(readOnly = true)
@@ -296,17 +308,23 @@ public class OrderServiceImpl implements OrderService {
             return new WaitingTimeUserResDto(null, null, null);
         }
         Purchase purchase = purchaseRepository.findById(purchaseId).get();
-        Long storeId = purchase.getStoreId();
         List<OrderRequest> orderRequestList = orderRequestRepository.findAllByStoreIdAndOrderStatusInAndIsDeletedFalseAndIsCanceledFalseOrderByOrderRequestDttmAsc(
-                storeId, Arrays.asList(OrderStatus.NOT_CONFIRM, OrderStatus.MAKING)
+                purchase.getStoreId(), Arrays.asList(OrderStatus.NOT_CONFIRM, OrderStatus.MAKING)
         );
-        Integer myOrderNumber = 0;
+        int myTurnNumber = 0;
         for (OrderRequest orderRequest : orderRequestList) {
             if (Objects.equals(orderRequest.getPurchaseId(), purchaseId)) {
-                myOrderNumber = orderRequestList.indexOf(orderRequest) + 1;
+                break;
             }
+            myTurnNumber++;
         }
-        return new WaitingTimeUserResDto(purchase.getStoreOrderNumber(), myOrderNumber, 90L * (myOrderNumber));
+        List<Long> purchaseIdList = new ArrayList<>();
+        for (int k = 0; k <= myTurnNumber; k++) {
+            purchaseIdList.add(orderRequestList.get(k).getPurchaseId());
+        }
+
+        Long menuCount = purchaseMenuRepository.countByPurchase_IdIn(purchaseIdList);
+        return new WaitingTimeUserResDto(purchase.getStoreOrderNumber(), myTurnNumber + 1, 90 * menuCount.intValue());
     }
 
     @Transactional(readOnly = true)

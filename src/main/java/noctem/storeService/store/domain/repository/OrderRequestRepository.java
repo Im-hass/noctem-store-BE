@@ -17,7 +17,7 @@ public interface OrderRequestRepository extends JpaRepository<OrderRequest, Long
     OrderRequest findByOrderStatusAndPurchaseId(OrderStatus orderStatus, Long purchaseId);
 
     // 매장 대기시간 조회시
-    Long countByStoreIdAndOrderStatusInAndIsDeletedFalseAndIsCanceledFalse(Long storeId, List<OrderStatus> orderStatusList);
+    List<OrderRequest> findAllByStore_IdAndOrderStatusInAndIsDeletedFalseAndIsCanceledFalse(Long storeId, List<OrderStatus> orderStatusList);
 
     // 유저 대기시간 조회시
     List<OrderRequest> findAllByStoreIdAndOrderStatusInAndIsDeletedFalseAndIsCanceledFalseOrderByOrderRequestDttmAsc(Long storeId, List<OrderStatus> orderStatusList);

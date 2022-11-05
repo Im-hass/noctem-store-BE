@@ -21,6 +21,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 @Slf4j
 @Service
 @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -42,9 +44,11 @@ public class KafkaConsumer {
             Purchase purchase = purchaseRepository.findById(vo.getPurchaseId()).get();
             // mysql에 주문요청 저장
             Store store = storeRepository.findById(purchase.getStoreId()).get();
+            LocalDateTime now = LocalDateTime.now();
             store.linkToOrderRequest(
                     OrderRequest.builder()
                             .purchaseId(vo.getPurchaseId())
+                            .orderRequestDttm(now)
                             .orderStatus(OrderStatus.NOT_CONFIRM)
                             .build()
             );
@@ -53,7 +57,7 @@ public class KafkaConsumer {
             // 유저의 현재 진행중인 주문에 추가
             redisRepository.setOrderInProgress(purchase.getUserAccountId(), purchase.getId());
             // redis 최초 주문요청된 시간 저장
-            redisRepository.setOrderRequestTime(purchase.getId());
+            redisRepository.setOrderRequestTime(purchase.getId(), now);
             // 매장 알림 서버에 전송
             kafkaTemplate.send(PURCHASE_FROM_USER_TOPIC,
                     AppConfig.objectMapper().writeValueAsString(new PurchaseFromUserVo(vo.getStoreId(), vo.getMenuFullName(), vo.getTotalMenuQty(), purchase.getStoreOrderNumber())));
