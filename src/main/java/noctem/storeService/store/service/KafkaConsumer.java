@@ -60,7 +60,7 @@ public class KafkaConsumer {
             redisRepository.setOrderRequestTime(purchase.getId(), now);
             // 매장 알림 서버에 전송
             kafkaTemplate.send(PURCHASE_FROM_USER_TOPIC,
-                    AppConfig.objectMapper().writeValueAsString(new PurchaseFromUserVo(vo.getStoreId(), vo.getMenuFullName(), vo.getTotalMenuQty(), purchase.getStoreOrderNumber())));
+                    AppConfig.objectMapper().writeValueAsString(new PurchaseFromUserVo(vo.getStoreId(), vo.getMenuFullName(), vo.getTotalMenuQty(), purchase.getStoreOrderNumber(), purchase.getUserAccountId(), purchase.getId())));
             log.info("Send totalMenuQty through [{}] TOPIC", PURCHASE_FROM_USER_TOPIC);
             log.info("Kafka consume process done. purchaseId={} through [{}] TOPIC", vo.getPurchaseId(), PURCHASE_TO_STORE_TOPIC);
         } catch (JsonProcessingException e) {
