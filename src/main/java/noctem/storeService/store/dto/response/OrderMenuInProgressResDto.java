@@ -13,9 +13,9 @@ public class OrderMenuInProgressResDto {
     private String menuFullName;
     private String menuShortName;
     private String imgUrl = null;
-    private String menuTemperature;
-    private String menuSize;
-    private String menuCupType;
+    private String temperature;
+    private String size;
+    private String cupType;
     private Integer qty;
     private Long menuTotalPrice;
 
@@ -24,9 +24,9 @@ public class OrderMenuInProgressResDto {
         this.categorySmall = purchaseMenu.getCategorySmall().getValue();
         this.menuFullName = purchaseMenu.getMenuFullName();
         this.menuShortName = purchaseMenu.getMenuShortName();
-        this.menuTemperature = purchaseMenu.getTemperature();
-        this.menuSize = purchaseMenu.getSize();
-        this.menuCupType = purchaseMenu.getCupType().getValue();
+        this.temperature = purchaseMenu.getTemperature();
+        this.size = purchaseMenu.getSize();
+        this.cupType = purchaseMenu.getCupType().getValue();
         this.qty = purchaseMenu.getQty();
         this.menuTotalPrice = purchaseMenu.getMenuTotalPrice().longValue();
     }

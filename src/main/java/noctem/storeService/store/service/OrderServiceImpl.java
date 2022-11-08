@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /***
@@ -97,9 +98,10 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(readOnly = true)
     @Override
     public List<OrderRequestResDto> getCompletedOrders() {
-        List<OrderRequest> completedOrderList = orderRequestRepository.findTop5ByOrderStatusAndStoreIdAndIsDeletedFalseOrderByOrderRequestDttmDesc(OrderStatus.COMPLETED, clientInfoLoader.getStoreId());
-        List<Purchase> purchaseList = purchaseRepository.findAllByIdIn(
-                completedOrderList.stream().map(OrderRequest::getPurchaseId).collect(Collectors.toList()));
+        List<OrderRequest> completedOrderList = orderRequestRepository.findTop5ByOrderStatusAndStoreIdAndIsDeletedFalseOrderByCreatedAtDesc(OrderStatus.COMPLETED, clientInfoLoader.getStoreId());
+        Map<Long, Purchase> purchaseMap = purchaseRepository.findAllByIdIn(
+                completedOrderList.stream().map(OrderRequest::getPurchaseId).collect(Collectors.toList())
+        ).stream().collect(Collectors.toMap(Purchase::getId, Function.identity()));
 
         Map<Long, String> orderRequestTimeMap = new HashMap<>();
 
@@ -109,8 +111,8 @@ public class OrderServiceImpl implements OrderService {
                 orderRequestTimeMap.put(e.getPurchaseId(), orderRequestTime);
             }
         });
-
-        return purchaseList.stream().map(e -> new OrderRequestResDto(e, orderRequestTimeMap.get(e.getId())))
+        return completedOrderList.stream()
+                .map(e -> new OrderRequestResDto(purchaseMap.get(e.getPurchaseId()), orderRequestTimeMap.get(e.getPurchaseId())))
                 .collect(Collectors.toList());
     }
 
