@@ -3,7 +3,6 @@ package noctem.storeService.store.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import noctem.storeService.global.common.CommonResponse;
-import noctem.storeService.store.dto.response.OrderMenuInProgressResDto;
 import noctem.storeService.store.dto.response.OrderRequestResDto;
 import noctem.storeService.store.service.OrderService;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -127,10 +126,8 @@ public class OrderController {
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/orderMenuInProgress")
     public CommonResponse getOrderMenuInProgress() {
-        List<OrderMenuInProgressResDto> dtoList = orderService.getOrderMenuInProgress();
-        dtoList.forEach(e -> e.setIndex(dtoList.indexOf(e)));
         return CommonResponse.builder()
-                .data(dtoList)
+                .data(orderService.getOrderMenuInProgress())
                 .build();
     }
 
