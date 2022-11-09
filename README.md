@@ -44,7 +44,7 @@
 - admin service
   https://github.com/arotein/noctem-admin-BE.git
 
-## 결과물(2022.11.11일까지 접속가능)
+## 결과물
 
 - Front User Server
   https://noctem-user1-fe.vercel.app/
