@@ -304,29 +304,35 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(readOnly = true)
     @Override
     public WaitingTimeUserResDto getUserWaitingTime() {
+        log.info("1번 userAccountId={}", clientInfoLoader.getUserAccountId());
         Long purchaseId = redisRepository.getPurchaseIdOrderInProgress(clientInfoLoader.getUserAccountId());
-        // 현재 진행중인 주문이 없을 경우
+        log.info("2번 purchaseId={}", purchaseId);
+        // 현재 진행중인 주문이 없는 경우
         if (purchaseId == null) {
             return new WaitingTimeUserResDto(null, null, null);
         }
         Purchase purchase = purchaseRepository.findById(purchaseId).get();
+
         List<OrderRequest> orderRequestList = orderRequestRepository.findAllByStoreIdAndOrderStatusInAndIsDeletedFalseAndIsCanceledFalseOrderByOrderRequestDttmAsc(
                 purchase.getStoreId(), Arrays.asList(OrderStatus.NOT_CONFIRM, OrderStatus.MAKING)
         );
-        int myTurnNumber = 0;
+        int myTurnIndex = 0;
         for (OrderRequest orderRequest : orderRequestList) {
             if (Objects.equals(orderRequest.getPurchaseId(), purchaseId)) {
                 break;
             }
-            myTurnNumber++;
+            myTurnIndex++;
         }
+        log.info("3번 myTurnIndex={}, orderRequestList.size={}", myTurnIndex, orderRequestList.size());
         List<Long> purchaseIdList = new ArrayList<>();
-        for (int k = 0; k <= myTurnNumber; k++) {
+        for (int k = 0; k < myTurnIndex; k++) {
             purchaseIdList.add(orderRequestList.get(k).getPurchaseId());
         }
+        purchaseIdList.add(purchaseId);
 
         Long menuCount = purchaseMenuRepository.countByPurchase_IdIn(purchaseIdList);
-        return new WaitingTimeUserResDto(purchase.getStoreOrderNumber(), myTurnNumber + 1, 90 * menuCount.intValue());
+        log.info("4번 menuCount={}", menuCount);
+        return new WaitingTimeUserResDto(purchase.getStoreOrderNumber(), myTurnIndex + 1, 90 * menuCount.intValue());
     }
 
     @Transactional(readOnly = true)

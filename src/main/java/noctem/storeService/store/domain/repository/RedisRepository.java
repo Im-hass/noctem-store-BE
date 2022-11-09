@@ -15,8 +15,6 @@ public interface RedisRepository {
 
     String getOrderRequestTime(Long purchaseId);
 
-    void setOrderInProgress(Long userAccountId, Long purchaseId);
-
     Long getPurchaseIdOrderInProgress(Long userAccountId);
 
     void delOrderInProgress(Long userAccountId);

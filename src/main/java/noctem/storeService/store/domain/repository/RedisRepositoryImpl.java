@@ -51,12 +51,6 @@ public class RedisRepositoryImpl implements RedisRepository {
     }
 
     @Override
-    public void setOrderInProgress(Long userAccountId, Long purchaseId) {
-        String key = String.format("%s:%d", ORDER_IN_PROGRESS_KEY_PREFIX, userAccountId);
-        redisLongTemplate.opsForValue().set(key, purchaseId);
-    }
-
-    @Override
     public Long getPurchaseIdOrderInProgress(Long userAccountId) {
         String key = String.format("%s:%d", ORDER_IN_PROGRESS_KEY_PREFIX, userAccountId);
         return redisLongTemplate.opsForValue().get(key);

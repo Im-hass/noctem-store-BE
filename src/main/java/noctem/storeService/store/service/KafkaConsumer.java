@@ -54,8 +54,6 @@ public class KafkaConsumer {
             );
             // redis 주문 상태 저장 => 주문취소관련 동시성이슈 회피하기위한 데이터
             redisRepository.setOrderStatus(vo.getPurchaseId(), OrderStatus.NOT_CONFIRM);
-            // 유저의 현재 진행중인 주문에 추가
-            redisRepository.setOrderInProgress(purchase.getUserAccountId(), purchase.getId());
             // redis 최초 주문요청된 시간 저장
             redisRepository.setOrderRequestTime(purchase.getId(), now);
             // 매장 알림 서버에 전송
