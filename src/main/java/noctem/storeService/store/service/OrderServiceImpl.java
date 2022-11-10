@@ -304,9 +304,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(readOnly = true)
     @Override
     public WaitingTimeUserResDto getUserWaitingTime() {
-        log.info("1번 userAccountId={}", clientInfoLoader.getUserAccountId());
         Long purchaseId = redisRepository.getPurchaseIdOrderInProgress(clientInfoLoader.getUserAccountId());
-        log.info("2번 purchaseId={}", purchaseId);
         // 현재 진행중인 주문이 없는 경우
         if (purchaseId == null) {
             return new WaitingTimeUserResDto(null, null, null);
@@ -323,7 +321,6 @@ public class OrderServiceImpl implements OrderService {
             }
             myTurnIndex++;
         }
-        log.info("3번 myTurnIndex={}, orderRequestList.size={}", myTurnIndex, orderRequestList.size());
         List<Long> purchaseIdList = new ArrayList<>();
         for (int k = 0; k < myTurnIndex; k++) {
             purchaseIdList.add(orderRequestList.get(k).getPurchaseId());
@@ -331,7 +328,6 @@ public class OrderServiceImpl implements OrderService {
         purchaseIdList.add(purchaseId);
 
         Long menuCount = purchaseMenuRepository.countByPurchase_IdIn(purchaseIdList);
-        log.info("4번 menuCount={}", menuCount);
         return new WaitingTimeUserResDto(purchase.getStoreOrderNumber(), myTurnIndex + 1, 90 * menuCount.intValue());
     }
 

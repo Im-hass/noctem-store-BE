@@ -77,6 +77,7 @@
 - Spring WebFlux SSE 알림 구현
 - Spring Batch CQRS패턴 적용
 - Kafka로 서비스간 통신
+- 각 서버는 Docker로 컨테이너화시켜 배포
 
 ## ☕ CI/CD
 
@@ -85,7 +86,6 @@
 ### 특징
 
 - Docker 및 Jenkins를 이용하여 빌드/배포 자동화
-- docker-compose를 이용하여 환경변수 설정
 
 ## ☕ 사용 기술
 
