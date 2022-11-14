@@ -74,10 +74,11 @@
 ### 특징
 
 - MicroService Architecture
-- Spring WebFlux SSE 알림 구현
-- Spring Batch CQRS패턴 적용
-- Kafka로 서비스간 통신
+- Spring WebFlux로 SSE 알림 구현
+- Spring Batch로 통계데이터 API 응답 속도 개선
+- Kafka로 서비스간 비동기 통신
 - 각 서버는 Docker로 컨테이너화시켜 배포
+- Prometheus, Grafana로 서버 모니터링
 
 ## ☕ CI/CD
 
@@ -86,6 +87,7 @@
 ### 특징
 
 - Docker 및 Jenkins를 이용하여 빌드/배포 자동화
+- Slack 연동을 통해 팀원간 빌드/배포 상태 공유
 
 ## ☕ 사용 기술
 
