@@ -80,7 +80,7 @@
 ### 특징
 
 - MicroService Architecture
-- Spring WebFlux로 SSE 알림 구현
+- Spring WebFlux로 실시간 SSE 알림 구현
 - Spring Batch로 통계데이터 API 응답 속도 개선
 - Kafka로 서비스간 비동기 통신
 - 각 서버는 Docker로 컨테이너화시켜 배포
