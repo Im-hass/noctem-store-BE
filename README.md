@@ -18,6 +18,11 @@
   > https://noctem-user1-fe.vercel.app/
 
   ![](https://github.com/arotein/noctem-store-BE/blob/main/img/Noctem_User_QR.jpg)
+  >
+  > ※ User Service Test Account
+  > | ID | PW |
+  > |--- |--- |
+  > | test@test.com | test1234 |
 
 - Admin Service
 
@@ -26,8 +31,9 @@
   > https://noctem-admin-fe.vercel.app/
   >
   > ※ Admin Service Test Account  
-  > ID : noctem1  
-  > PW : noctem
+  > | ID | PW |
+  > |--- |--- |
+  > | noctem1 | noctem |
 
 ## ☕ Repository URL
 
