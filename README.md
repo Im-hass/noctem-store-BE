@@ -17,7 +17,7 @@
   >
   > https://noctem-user1-fe.vercel.app/
 
-  ![](https://github.com/arotein/noctem-store-BE/blob/main/img/QR%20mini.png)
+  ![](https://github.com/arotein/noctem-store-BE/blob/main/img/Noctem_User_QR.jpg)
 
 - Admin Service
 
